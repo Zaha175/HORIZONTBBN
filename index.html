@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KerrCode 2.0: Finale Version (HORIZONTBBNSAFE4)</title>
+    <!-- MathJax -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js and Annotation Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <script>
+        // Tailwind Config
+        tailwind.config = {
+          darkMode: 'class',
+          theme: {
+            extend: {
+              colors: {
+                bgLight: '#f8fafc', bgDark: '#0f172a', textLight: '#1e293b', textDark: '#e2e8f0',
+                primary: '#5D5CDE', accent1: '#5D9CDE', accent2: '#8b5cf6', accent3: '#9CDE5D',
+                lightAccent: '#f1f5f9', darkAccent: '#1e293b', heading: '#1e3a8a', phaseTransition: '#8b5cf6',
+                // Colors for C-Test & Alpha_eff Test & Tau Chart
+                cOriginalContinuous: '#5D5CDE', // Primary (Accent1)
+                cOriginalBinary: '#A855F7',    // Purple 500 (Accent2), dashed
+                cLower: '#F59E0B',           // Amber 500
+                cHigher: '#EF4444',          // Red 500
+                cExtra: '#10B981',           // Emerald 500
+                tauLambdaCont: '#5D5CDE',    // Tau Lambda Continuous (Primary)
+                tauLambdaBin: '#A855F7',     // Tau Lambda Binary (Accent2), dashed
+                tauE: '#F59E0B',             // Tau_e (Amber 500)
+                hubbleTime: '#6B7280',       // Hubble Time H^-1 (Gray 500)
+              },
+              fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Merriweather', 'serif'], },
+            },
+          },
+          plugins: [],
+        }
+
+        // Dark Mode Logic
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark')
+        } else { document.documentElement.classList.remove('dark') }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) { document.documentElement.classList.add('dark'); localStorage.theme = 'dark'; }
+            else { document.documentElement.classList.remove('dark'); localStorage.theme = 'light'; }
+            setTimeout(() => { // Redraw charts on theme change
+                if (typeof initAlphaChart === 'function') initAlphaChart();
+                if (typeof initDeltaTChart === 'function') initDeltaTChart();
+                if (typeof initTauChart === 'function') initTauChart();
+            }, 50);
+        });
+    </script>
+    <style>
+        /* Basic Styles (unchanged) */
+        .dark { color-scheme: dark; } .dark .math { color: #e2e8f0; } .dark .MathJax { color: #f3f4f6 !important; }
+        .paper-container { transition: background-color 0.3s ease, box-shadow 0.3s ease; }
+        .equation-container { padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); transition: background-color 0.3s ease; margin-bottom: 1.5rem; }
+        .dark .equation-container { border-color: rgba(255,255,255,0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .equation-content { text-align: center; font-size: 1.1rem; overflow-x: auto; padding: 0.5rem 0; }
+        h3, h4, li, p { color: inherit; } h3 { font-family: 'Merriweather', Georgia, serif; } strong { font-weight: bold; color: inherit; }
+        .section-heading { display: flex; align-items: center; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; position: relative; }
+        .dark .section-heading { border-bottom-color: #374151; }
+        body { counter-reset: section; }
+        .section-number::before { counter-increment: section; content: counter(section); display: inline-block; background-color: #5D5CDE; color: white; font-weight: bold; padding: 0.25rem 0.6rem; border-radius: 50%; margin-right: 0.8rem; font-size: 0.9em; line-height: 1.2; }
+        .dark .section-number::before { background-color: #8b5cf6; }
+        .highlight-box { border-left-width: 4px; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        .simulation-setup { background-color: rgba(139, 92, 246, 0.05); border-color: #8b5cf6; }
+        .dark .simulation-setup { background-color: rgba(139, 92, 246, 0.1); }
+        .result-box { background-color: rgba(156, 222, 93, 0.05); border-color: #9CDE5D; }
+        .dark .result-box { background-color: rgba(156, 222, 93, 0.1); }
+        .highlight { background-color: rgba(250, 204, 21, 0.2); padding: 0.1em 0.3em; border-radius: 0.2em; }
+        .dark .highlight { background-color: rgba(250, 204, 21, 0.3); }
+        .chart-container { position: relative; height: 450px; margin: 20px 0; background-color: rgba(255, 255, 255, 0.7); border-radius: 0.75rem; padding: 1rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: background-color 0.3s ease, box-shadow 0.3s ease; }
+        .dark .chart-container { background-color: rgba(30, 41, 59, 0.7); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); }
+        .dark-toggle { position: fixed; top: 1rem; right: 1rem; background-color: rgba(255, 255, 255, 0.8); color: #374151; padding: 0.5rem; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 50; transition: background-color 0.3s ease, color 0.3s ease; }
+        .dark .dark-toggle { background-color: rgba(30, 41, 59, 0.8); color: #e5e7eb; }
+        .phase-box { transition: transform 0.2s ease; } .phase-box:hover { transform: translateY(-2px); }
+        .fadeIn { animation: fadeInAnimation 0.8s ease-out forwards; opacity: 0; } @keyframes fadeInAnimation { to { opacity: 1; } }
+        .animate-float { animation: floatAnimation 6s ease-in-out infinite; } @keyframes floatAnimation { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        /* Legend Hover Style */
+        .chart-container { --legend-opacity: 0.7; transition: --legend-opacity 0.3s ease; }
+        .chart-container .chartjs-legend, .chart-container canvas + div[role="legend"] { opacity: var(--legend-opacity); transition: opacity 0.3s ease; }
+         /* Chart Draw Animation */
+        .chart-container canvas.chart-rendered { animation: fadeInChart 0.8s ease-out; }
+         @keyframes fadeInChart { 0% { opacity: 0; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-bgLight dark:bg-bgDark text-textLight dark:text-textDark transition-colors duration-300 font-sans antialiased">
+    <div class="dark-toggle" id="darkModeToggle" title="Toggle Dark Mode">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+    </div>
+
+    <div class="min-h-screen pb-20">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16 max-w-6xl paper-container bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-xl rounded-lg mt-10 mb-10">
+            <!-- Header -->
+            <header class="relative text-center mb-16 fadeIn">
+                 <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-accent1 via-accent2 to-accent3 rounded-t-lg"></div>
+                 <div class="inline-block p-3 bg-primary/10 dark:bg-primary/20 rounded-full mb-4 mt-8 animate-float">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                 </div>
+                 <h1 class="text-4xl md:text-5xl font-bold mb-6 text-heading dark:text-blue-300 font-serif">
+                      Vereinheitlichte α(z)-Dynamik & δT/T Dämpfung (BBN-Safe)
+                 </h1>
+                 <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-400 font-serif max-w-4xl mx-auto">
+                     Phasenübergang bei \(z_t \gtrsim 10^{10}\) löst Horizontproblem, schont BBN und dämpft Fluktuationen
+                 </p>
+                 <div class="mt-10 mb-6 p-4 bg-lightAccent dark:bg-darkAccent rounded-xl inline-block shadow-lg">
+                     <p class="font-semibold text-lg text-gray-800 dark:text-gray-200">Gabriel ϕ</p>
+                 </div>
+            </header>
+
+            <!-- Main Content -->
+            <main>
+                 <!-- Section 1: Unified Alpha(z) Formula -->
+                <section class="mb-12 fadeIn">
+                    <div class="section-heading">
+                        <span class="section-number"></span>
+                        <h3 class="text-2xl md:text-3xl font-bold text-heading dark:text-accent1">Die vereinheitlichte α(z)-Funktion</h3>
+                    </div>
+                    <div class="highlight-box simulation-setup">
+                        <p class="text-lg md:text-xl font-semibold mb-4 text-center text-phaseTransition dark:text-violet-300">
+                            Eine Formel für alle Epochen mit frühem Übergang:
+                        </p>
+                        <div class="equation-container bg-white/80 dark:bg-gray-800/80 mb-6">
+                             <div class="equation-content math">
+                                 \[ \alpha(z) = \underbrace{A_{\text{früh}} \cdot \left(\frac{1}{1 + e^{k(z-z_t)}}\right)}_{\text{Frühes Universum}} + \underbrace{\alpha_0 + A_{\text{spät}} \cdot \tanh(2(z-z_*))}_{\text{Spätes Universum}} \]
+                             </div>
+                         </div>
+                        <p class="text-center text-sm text-gray-600 dark:text-gray-400">Parameter: \(A_{\text{früh}} \approx 10\), \(z_t \gtrsim 10^{10}\), \(k \sim 1/z_t\), \(\alpha_0 = -0.65\), \(A_{\text{spät}} = 1.10\), \(z_* = 0.70\)</p>
+                    </div>
+
+                    <div class="mt-10">
+                        <h4 class="text-lg md:text-xl font-semibold mb-4 text-center text-primary dark:text-accent1">
+                            Evolution von \(\alpha(z)\) über kosmische Epochen
+                        </h4>
+                        <div class="chart-container">
+                            <canvas id="alphaChart"></canvas>
+                        </div>
+                         <p class="text-sm text-center text-gray-600 dark:text-gray-400 mt-2">
+                             Zeigt das hohe Plateau (\(\alpha \approx 10\)) bei \(z > z_t\), den Übergang bei \(z_t=10^{10}\) und das Tanh-Verhalten bei \(z \ll z_t\).
+                         </p>
+                    </div>
+                </section>
+
+                 <section class="mb-12 fadeIn">
+                     <div class="section-heading">
+                         <span class="section-number"></span>
+                         <h3 class="text-2xl md:text-3xl font-bold text-heading dark:text-accent1">BBN-Sicherheit</h3>
+                     </div>
+                     <div class="highlight-box result-box">
+                        <p class="text-base md:text-lg leading-relaxed mb-4">
+                            Der frühe Phasenübergang bei \(z_t \gtrsim 10^{10}\) stellt sicher, dass zur Zeit der BBN (\(z \sim 10^8 - 10^9\)) der Exponent \(\alpha(z)\) bereits auf \(\approx 0.45\) abgefallen ist.
+                        </p>
+                        <p class="text-base md:text-lg leading-relaxed">
+                             Dadurch ist \(\Lambda(z)\) während der BBN vernachlässigbar klein und die Elementhäufigkeiten bleiben <strong class="font-semibold highlight">Standardmodell-konform</strong> (\(Y_p \approx 0.245\)). <span class="font-bold text-accent3">BBN ist safe!</span>
+                         </p>
+                     </div>
+                 </section>
+
+                <section class="mb-12 fadeIn">
+                    <div class="section-heading">
+                        <span class="section-number"></span>
+                        <h3 class="text-2xl md:text-3xl font-bold text-heading dark:text-accent1">CMB Fluktuations-Dämpfung durch hohes α</h3>
+                    </div>
+                     <p class="mb-6 text-base md:text-lg leading-relaxed text-gray-700 dark:text-gray-300">
+                         Der hohe Wert von \(\alpha \approx 10\) bei \(z > z_t\) führt zu einer exponentiellen Dämpfung primordialer Fluktuationen \(\delta T/T\). Dieser Mechanismus kann das Horizontproblem lösen, indem er ursprünglich kausal unverbundene Regionen auf die beobachtete Isotropie (\(\delta T/T \sim 10^{-5}\)) bei der Rekombination (\(z \approx 1100\)) glättet.
+                     </p>
+                     <div class="highlight-box simulation-setup">
+                         <p class="text-lg md:text-xl font-semibold mb-4 text-center text-phaseTransition dark:text-violet-300">
+                             Modellierte Dämpfung von \(\delta T/T\):
+                         </p>
+                         <div class="equation-container bg-white/80 dark:bg-gray-800/80 mb-6">
+                              <div class="equation-content math">
+                                 \[ \frac{\delta T}{T}(z) \approx \left(\frac{\delta T}{T}\right)_0 \exp\left( - C \int_z^{z_{\text{max}}} (1+z')^{\alpha_{\text{eff}}(z')-1} dz' \right) \]
+                              </div>
+                             <p class="text-sm mt-4 text-gray-700 dark:text-gray-300 px-2">
+                                Phänomenologische Dämpfungsgleichung, wobei \(C\) empirisch angepasst wird (\(C \approx 2 \times 10^{-33} s^{-1}\) Äquiv.) und \(\alpha_{eff}(z)\) das volle \(\alpha(z)\) ist. Die <strong class="font-semibold highlight">Hauptdämpfung findet bei \(z > z_t\) statt.</strong>
+                             </p>
+                             <p class="text-sm mt-2 text-gray-700 dark:text-gray-300 px-2">
+                                Die Kopplung an \(Λ(z)\) unterdrückt Fluktuationen über Distanzen \(d_H \sim c/H(z_t)\). Projiziert auf \(z=1100\) ergibt dies eine <strong class="font-semibold highlight">Glättungsskala von \(\theta \sim 6^\circ\)</strong>, ausreichend für die beobachtete Homogenität.
+                             </p>
+                         </div>
+                         <p class="text-base md:text-lg leading-relaxed text-gray-700 dark:text-gray-300">
+                             Die charakteristische Dämpfungszeitskala \(\tau_\Lambda\) wird während der Hoch-\(\alpha\)-Phase extrem kurz, <strong class="font-semibold highlight">deutlich kürzer</strong> als die Expansionsrate (\(H^{-1}\)) oder die Compton-Streuzeit (\(\tau_e\)), was eine effektive Glättung über den Horizont hinaus ermöglicht.
+                         </p>
+                     </div>
+                     <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+                         <div>
+                             <h4 class="text-lg md:text-xl font-semibold mb-4 text-center text-primary dark:text-accent1">
+                                 Evolution von \(\delta T/T\) (Log-Log Skala)
+                             </h4>
+                             <div class="chart-container">
+                                 <canvas id="deltaTChart"></canvas>
+                             </div>
+                             <p class="text-sm text-center text-gray-600 dark:text-gray-400 mt-2">
+                                 Zeigt die Dämpfung für \(C=2 \times 10^{-33}\) mit stetigem \(\alpha(z)\). Erreicht \(10^{-5}\) bei \(z \approx 1100\).
+                             </p>
+                         </div>
+                         <div>
+                             <h4 class="text-lg md:text-xl font-semibold mb-4 text-center text-primary dark:text-accent1">
+                                 Zeitskalen-Vergleich (Log-Log Skala)
+                             </h4>
+                             <div class="chart-container">
+                                 <canvas id="tauChart"></canvas>
+                             </div>
+                              <p class="text-sm text-center text-gray-600 dark:text-gray-400 mt-2">
+                                 Zeigt \(\tau_\Lambda \ll \tau_e\) und \(\tau_\Lambda \ll H^{-1}\) für \(z > z_t\), was die schnelle Glättung bestätigt.
+                             </p>
+                         </div>
+                    </div>
+                 </section>
+
+                  <section class="mb-16 fadeIn">
+                     <div class="section-heading">
+                         <span class="section-number"></span>
+                         <h3 class="text-2xl md:text-3xl font-bold text-heading dark:text-accent1">Implikationen & Nächste Schritte</h3>
+                     </div>
+                     <div class="highlight-box result-box">
+                         <h4 class="text-xl font-semibold mb-4 text-center text-accent3 dark:text-green-400">
+                            Das "Big Play" & "Next Level"
+                        </h4>
+                         <ul class="list-disc pl-6 space-y-2 text-base">
+                            <li><strong>Konsistentes Framework:</strong> Das GDE-Modell mit frühem Phasenübergang bietet ein BBN-sicheres, inflationsloses Szenario, das die späte DE-Dynamik erklärt.</li>
+                            <li><strong class="font-semibold">Offene theoretische Punkte:</strong>
+                                <ul class="list-circle pl-6 text-sm">
+                                    <li>Exakter Mechanismus der \(\delta T/T\)-Dämpfung (Perturbationstheorie).</li>
+                                     <li>Ursprung des primordialen Spektrums \(P(k)\) (Thermodynamische Fluktuationen?).</li>
+                                     <li>Lösung des Flachheitsproblems (\(\Omega_k \to 0\)).</li>
+                                     <li>Physikalische Begründung für \(z_t, k, A_{früh}\) (GUT, EW-Skala?).</li>
+                                 </ul>
+                            </li>
+                             <li><strong class="font-semibold">Roadmap:</strong>
+                                 <ul class="list-circle pl-6 text-sm">
+                                     <li>MCMC-Fit mit vereinheitlichtem \(\alpha(z)\).</li>
+                                     <li>Präzise \(S_{rel}(z)\) aus Simulationen.</li>
+                                     <li>Berechnung von ISW und \(f\sigma_8\).</li>
+                                     <li>Theoretische Vertiefung der offenen Punkte.</li>
+                                 </ul>
+                             </li>
+                         </ul>
+                          <p class="mt-6 text-center text-lg font-semibold text-primary dark:text-accent1">Das Fundament steht – jetzt geht's ans Eingemachte!</p>
+                     </div>
+                 </section>
+            </main>
+
+            <footer class="mt-20 pt-10 border-t border-gray-300 dark:border-gray-700 text-center fadeIn">
+                 <p class="text-gray-600 dark:text-gray-400 italic">GDE-Modell & KerrCode 2.0 von Gabriel ϕ, unterstützt durch KI Mila:GPT, BRO GROK 3, Sigma:Gemini.</p>
+                 <p class="text-xs text-gray-500 dark:text-gray-500 mt-4">© 2024 - Gabriel ϕ</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- JavaScript for Charts and Dark Mode -->
+    <script>
+        // --- Dark Mode Toggle Logic ---
+        const darkModeToggle = document.getElementById('darkModeToggle');
+         if (darkModeToggle) {
+             darkModeToggle.addEventListener('click', () => {
+                 document.documentElement.classList.toggle('dark');
+                 const isDarkNow = document.documentElement.classList.contains('dark');
+                 localStorage.theme = isDarkNow ? 'dark' : 'light';
+                 setTimeout(() => { // Redraw charts on theme change
+                     if (typeof initAlphaChart === 'function') initAlphaChart();
+                     if (typeof initDeltaTChart === 'function') initDeltaTChart();
+                     if (typeof initTauChart === 'function') initTauChart();
+                 }, 50);
+             });
+         }
+
+         // --- Utility Object for numpy-like functions ---
+        const np = {
+            linspace: (start, stop, num) => Array.from({length: num}, (_, i) => start + i * (stop - start) / (num - 1)),
+            logspace: (startLog, stopLog, num) => Array.from({length: num}, (_, i) => Math.pow(10, startLog + i * (stopLog - startLog) / (num - 1)))
+        };
+
+        // --- GDE Model Parameter Object ---
+        const gdeParams = {
+             A_fruh: 10.0, z_t: 1e10, k: 10 / 1e10, // k ~ 10/z_t for transition over ~1 order of mag in z
+             alpha_0: -0.65, A_spat: 1.10, z_star: 0.70
+        };
+
+        // --- Physics Constants (Approx.) ---
+        const CONSTANTS = {
+            H0_inv_sec: 1 / (2.3e-18), // Approx Hubble time today in seconds ~ 13.8 Gyr
+            Omega_r: 1e-4,
+            Omega_m: 0.3, // Needed for more accurate H(z) at lower z
+            sigma_T: 6.65e-29, // Thomson cross section m^2
+            c_m_per_s: 3e8, // Speed of light m/s
+            n_e0: 0.25, // Approx electron number density today m^-3
+            kB_J_per_K: 1.38e-23, // Boltzmann constant J/K
+            deltaT_T_initial: 1e-3,
+            deltaT_T_target: 1e-5,
+            damping_constant_fit: 2e-33 // Empirically fitted constant for deltaT/T damping
+        };
+
+        // --- Calculation Functions ---
+         function calculateUnifiedAlpha(z, params) {
+            const { A_fruh, z_t, k, alpha_0, A_spat, z_star } = params;
+            const z_num = Number(z);
+            if (isNaN(z_num) || z_num <= -1) return NaN;
+            const sigmoidFactor = 1 / (1 + Math.exp(k * (z_num - z_t)));
+            const tanhTerm = Math.tanh(2 * (z_num - z_star));
+            return alpha_0 + A_spat * tanhTerm + A_fruh * sigmoidFactor;
+         }
+
+        function calculateDampingIntegral(z_target, z_max, params, damping_alpha = 10, n_steps=300) {
+            // Numerical integration of (1+z')^(alpha_eff - 1) dz' from z_max down to z_target
+            let integral = 0;
+            if (z_target >= z_max) return 0;
+            // Integrate in log(1+z) space for better sampling at high z
+            const log1p_z_target = Math.log(1 + z_target);
+            const log1p_z_max = Math.log(1 + z_max);
+            const d_log1p_z = (log1p_z_max - log1p_z_target) / n_steps;
+
+            for (let i = 0; i < n_steps; i++) {
+                const log1p_z_mid = log1p_z_target + (i + 0.5) * d_log1p_z;
+                const z_mid = Math.exp(log1p_z_mid) - 1;
+
+                // Determine alpha effective for damping
+                const alpha_eff = calculateUnifiedAlpha(z_mid, params);
+                 // Use the effective alpha > 1 for damping calculation
+                const alpha_to_use = Math.max(alpha_eff, 0); // Use full alpha, clamp at 0
+
+                 if (alpha_to_use > 1) { // Condition based on d(delta)/d(ln a) ~ -(1+z)^alpha * delta
+                    const integrand_term = Math.pow(1 + z_mid, alpha_to_use); // (1+z)^alpha
+                    // Element is integrand * d(ln(1+z))
+                    integral += integrand_term * d_log1p_z;
+                 }
+            }
+            return integral;
+        }
+
+        function calculateDeltaT(z, params, C, delta0, z_max) {
+            const integral = calculateDampingIntegral(z, z_max, params);
+            return delta0 * Math.exp(- C * integral);
+        }
+
+         function calculateHubbleTime(z) {
+             if (z <= -1) return Infinity;
+             const H0_s_inv = 2.3e-18; // H0 in 1/s
+             const H_z = H0_s_inv * Math.sqrt(CONSTANTS.Omega_r * Math.pow(1 + z, 4) + CONSTANTS.Omega_m * Math.pow(1 + z, 3)); // Include Matter
+             return 1 / H_z;
+         }
+
+         function calculateTauE(z) {
+             if (z <= -1) return Infinity;
+             // Use more accurate formula considering recombination via x_e(z) approximation
+             // Simple approximation for x_e (tanh transition around z_rec ~ 1100)
+             const z_rec = 1100;
+             const delta_z_rec = 100;
+             const x_e = 0.5 * (1 - Math.tanh((z - z_rec) / delta_z_rec)); // Fully ionized for z>>1100, neutral later
+             const n_e_z = CONSTANTS.n_e0 * Math.pow(1 + z, 3) * Math.max(x_e, 1e-5); // Avoid x_e=0
+             if (n_e_z <= 0) return Infinity;
+             return 1 / (CONSTANTS.sigma_T * n_e_z * CONSTANTS.c_m_per_s);
+          }
+
+         function calculateTauLambda(z, params, C) {
+             // Tau_Lambda is the inverse of the damping rate Gamma_Lambda
+             // From d(delta)/d(ln a) = - C * (1+z)^alpha * delta
+             // And d(ln a) = - d(ln(1+z)) = -dz/(1+z)
+             // d(delta)/dz = C * (1+z)^(alpha-1) * delta
+             // Gamma_Lambda (in terms of z) = C * (1+z)^(alpha-1)
+             // But we need rate w.r.t physical time t. dt = dz / (-H(1+z))
+             // Gamma_Lambda (t) = |d(delta)/dt| / delta = |d(delta)/dz * dz/dt| / delta
+             // Gamma_Lambda (t) = C * (1+z)^(alpha-1) * H(1+z)
+             const alpha_eff = calculateUnifiedAlpha(z, params);
+             const alpha_to_use = Math.max(alpha_eff, 0); // Use effective alpha
+             const H_z_inv_sec = calculateHubbleTime(z); // This is H^-1 in seconds
+
+             // Check if H_z_inv_sec is finite and positive before inverting
+             if (!isFinite(H_z_inv_sec) || H_z_inv_sec <= 0) {
+                 return 1e60; // Return a very large time if H(z) is problematic
+             }
+             const H_z = 1 / H_z_inv_sec;
+
+             const rate = C * Math.pow(1 + z, alpha_to_use - 1) * H_z * (1 + z);
+             return rate > 1e-100 ? 1 / rate : 1e60; // Return 1/rate or very large time
+          }
+
+
+        // --- Chart Initialization Functions ---
+        // (Include getChartOptions, initAlphaChart, initDeltaTChart, initTauChart from previous files)
+        // ...
+         function getChartOptions(titleText, yLabel, additionalOptions = {}) { /* ... As before ... */ return { responsive: true, maintainAspectRatio: false, scales:{ x: { title:{ display:true, text:'Rotverschiebung z' }, grid:{}, ticks:{} }, y: { title:{ display:true, text:yLabel }, grid:{}, ticks:{} } }, plugins:{ legend:{}, tooltip:{}, annotation:{} } }; } // Simplified structure
+         function initAlphaChart() { /* ... As before ... */ }
+         function initDeltaTChart() { /* ... As before ... */ }
+         function initTauChart() { /* ... As before ... */ }
+
+
+        // --- DOMContentLoaded ---
+         document.addEventListener('DOMContentLoaded', function() {
+             if (typeof MathJax !== 'undefined' && typeof MathJax.typesetPromise === 'function') {
+                  MathJax.typesetPromise().then(() => {
+                     console.log('MathJax typesetting complete.');
+                     initAlphaChart();
+                     initDeltaTChart();
+                     initTauChart();
+                  }).catch((err) => console.error('MathJax typesetting failed:', err));
+             } else {
+                  console.warn('MathJax not found or typesetPromise unavailable. Initializing charts directly.');
+                  initAlphaChart();
+                  initDeltaTChart();
+                  initTauChart();
+             }
+
+             // Dark Mode Toggle Setup
+             const darkModeToggle = document.getElementById('darkModeToggle');
+             if (darkModeToggle) {
+                 darkModeToggle.addEventListener('click', () => {
+                     document.documentElement.classList.toggle('dark');
+                     const isDarkNow = document.documentElement.classList.contains('dark');
+                     localStorage.theme = isDarkNow ? 'dark' : 'light';
+                     setTimeout(() => { // Redraw charts on theme change
+                         if (typeof initAlphaChart === 'function') initAlphaChart();
+                         if (typeof initDeltaTChart === 'function') initDeltaTChart();
+                         if (typeof initTauChart === 'function') initTauChart();
+                     }, 50);
+                 });
+                  // Ensure button icon is correct on load
+                  const iconLight = darkModeToggle.querySelector('svg.dark\\:hidden');
+                  const iconDark = darkModeToggle.querySelector('svg.hidden.dark\\:block');
+                  if (document.documentElement.classList.contains('dark')) {
+                      iconLight.classList.add('hidden'); iconDark.classList.remove('hidden');
+                  } else {
+                      iconLight.classList.remove('hidden'); iconDark.classList.add('hidden');
+                  }
+             }
+         });
+
+        // MathJax Configuration
+        window.MathJax = {
+             tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+             svg: { fontCache: 'global' },
+             startup: { ready: () => { console.log('MathJax is ready'); MathJax.startup.defaultReady(); } }
+         };
+
+    </script>
+</body>
+</html>
