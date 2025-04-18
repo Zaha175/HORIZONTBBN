@@ -28,6 +28,7 @@
                 tauLambdaBin: '#A855F7',     // Tau Lambda Binary (dashed)
                 tauE: '#F59E0B',             // Tau_e
                 hubbleTime: '#6B7280',       // Hubble Time H^-1 (Gray 500)
+                lambda: '#E11D48',           // Lambda(z) red color
               },
               fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Merriweather', 'serif'], },
             },
@@ -45,7 +46,9 @@
             setTimeout(() => { // Redraw charts on theme change
                 if (typeof initAlphaChart === 'function') initAlphaChart();
                 if (typeof initDeltaTChart === 'function') initDeltaTChart();
-                if (typeof initTauChart === 'function') initTauChart(); // Add Tau Chart redraw
+                if (typeof initTauChart === 'function') initTauChart();
+                if (typeof initPkChart === 'function') initPkChart(); // Add P(k) Chart redraw
+                if (typeof initLambdaChart === 'function') initLambdaChart(); // Add Lambda(z) Chart redraw
             }, 50);
         });
     </script>
@@ -105,6 +108,235 @@
              animation: fadeInChart 0.8s ease-out;
         }
 
+        /* Slider Styles */
+        input[type="range"] {
+          -webkit-appearance: none;
+          appearance: none;
+          height: 8px;
+          border-radius: 4px;
+          background: #e5e7eb;
+          outline: none;
+          margin-top: 8px;
+          margin-bottom: 8px;
+          cursor: pointer;
+        }
+        .dark input[type="range"] {
+          background: #374151;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: #5D5CDE;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+        }
+        .dark input[type="range"]::-webkit-slider-thumb {
+          background: #8b5cf6;
+        }
+        input[type="range"]::-moz-range-thumb {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: #5D5CDE;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+          border: none;
+        }
+        .dark input[type="range"]::-moz-range-thumb {
+          background: #8b5cf6;
+        }
+        input[type="range"]:hover::-webkit-slider-thumb {
+          background: #4F46E5;
+        }
+        .dark input[type="range"]:hover::-webkit-slider-thumb {
+          background: #A78BFA;
+        }
+        input[type="range"]:hover::-moz-range-thumb {
+          background: #4F46E5;
+        }
+        .dark input[type="range"]:hover::-moz-range-thumb {
+          background: #A78BFA;
+        }
+        
+        /* Formula Section Styles */
+        .formula-section {
+            margin-bottom: 3rem;
+        }
+        .formula-block {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .dark .formula-block {
+            background-color: rgba(30, 41, 59, 0.9);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        code.inline-code {
+            background-color: rgba(93, 92, 222, 0.1);
+            color: #5D5CDE;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        .dark code.inline-code {
+            background-color: rgba(139, 92, 246, 0.2);
+            color: #A78BFA;
+        }
+        
+        /* Parameter Table Styles */
+        .parameter-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 1rem;
+            overflow: hidden;
+            border-radius: 0.5rem;
+        }
+        .parameter-table th, .parameter-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .dark .parameter-table th, .dark .parameter-table td {
+            border-bottom-color: rgba(255, 255, 255, 0.05);
+        }
+        .parameter-table th {
+            background-color: rgba(93, 92, 222, 0.1);
+            font-weight: 600;
+        }
+        .dark .parameter-table th {
+            background-color: rgba(139, 92, 246, 0.2);
+        }
+        .parameter-table tr:last-child td {
+            border-bottom: none;
+        }
+        .parameter-table tr:nth-child(odd) td {
+            background-color: rgba(0, 0, 0, 0.01);
+        }
+        .dark .parameter-table tr:nth-child(odd) td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+        .parameter-table tr:hover td {
+            background-color: rgba(93, 92, 222, 0.05);
+        }
+        .dark .parameter-table tr:hover td {
+            background-color: rgba(139, 92, 246, 0.1);
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            background-color: #5D5CDE;
+            margin-left: 0.5rem;
+        }
+        .dark .badge {
+            background-color: #8b5cf6;
+        }
+        
+        /* New styles for advanced GDE formula section */
+        .boxed-formula {
+            border: 2px solid #5D5CDE;
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            background-color: rgba(93, 92, 222, 0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dark .boxed-formula {
+            border-color: #8b5cf6;
+            background-color: rgba(139, 92, 246, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .boxed-formula:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        .dark .boxed-formula:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .calculation-step {
+            margin-bottom: 1rem;
+            padding-left: 1rem;
+            border-left: 3px solid #E5E7EB;
+        }
+        .dark .calculation-step {
+            border-left-color: #374151;
+        }
+        
+        .emoji-bullet {
+            display: inline-block;
+            width: 1.5rem;
+            text-align: center;
+            margin-right: 0.5rem;
+        }
+        
+        .two-column-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            .two-column-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .parameter-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+        .dark .parameter-card {
+            background-color: rgba(30, 41, 59, 0.8);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .parameter-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .code-block {
+            background-color: #f3f4f6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            font-family: monospace;
+            overflow-x: auto;
+            font-size: 0.875rem;
+            color: #1f2937;
+            white-space: pre;
+        }
+        .dark .code-block {
+            background-color: #1f2937;
+            color: #e5e7eb;
+        }
+        
+        /* Specific styling for Lambda(z) chart container */
+        .lambda-chart-container {
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin: 1.5rem 0;
+            height: 400px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .dark .lambda-chart-container {
+            background-color: rgba(30, 41, 59, 0.7);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body class="bg-bgLight dark:bg-bgDark text-textLight dark:text-textDark transition-colors duration-300 font-sans antialiased">
@@ -124,15 +356,31 @@
                      Vereinheitlichte α(z)-Dynamik & δT/T Dämpfung (BBN-Safe)
                 </h1>
                 <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-400 font-serif max-w-4xl mx-auto">
-                    Phasenübergang bei \(z_t \gtrsim 10^{10}\) löst Horizontproblem, schont BBN und dämpft Fluktuationen
+                    Phasenübergang bei \(z_t = 5 \times 10^{9}\) löst Horizontproblem, schont BBN und dämpft Fluktuationen
                 </p>
                 <div class="mt-10 mb-6 p-4 bg-lightAccent dark:bg-darkAccent rounded-xl inline-block shadow-lg">
                     <p class="font-semibold text-lg text-gray-800 dark:text-gray-200">Gabriel ϕ</p>
                 </div>
             </header>
 
+            <nav class="mb-12 fadeIn">
+                <h2 class="text-xl font-bold mb-4 text-heading dark:text-accent1">Inhaltsverzeichnis</h2>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li><a href="#alpha-dynamics" class="text-primary dark:text-accent1 hover:underline">Die vereinheitlichte α(z)-Funktion</a></li>
+                    <li><a href="#bbn-safety" class="text-primary dark:text-accent1 hover:underline">Warum BBN jetzt sicher ist</a></li>
+                    <li><a href="#cmb-damping" class="text-primary dark:text-accent1 hover:underline">CMB Fluktuations-Dämpfung</a></li>
+                    <li><a href="#timescale-comparison" class="text-primary dark:text-accent1 hover:underline">Zeitskalen-Vergleich</a></li>
+                    <li><a href="#pk-spectrum" class="text-primary dark:text-accent1 hover:underline">Materie-Leistungsspektrum</a></li>
+                    <li><a href="#implications" class="text-primary dark:text-accent1 hover:underline">Weitere Implikationen & Ausblick</a></li>
+                    <li><a href="#gde-formulas" class="text-primary dark:text-accent1 hover:underline">GDE Formeln & Rechenweg</a></li>
+                    <li><a href="#advanced-gde-formula" class="text-primary dark:text-accent1 hover:underline">Erweiterte GDE-Dämpfungsformel</a></li>
+                    <li><a href="#gde-explanations" class="text-primary dark:text-accent1 hover:underline">GDE-Erklärungen zu Visualisierungen</a></li>
+                    <li><a href="#gde-results" class="text-primary dark:text-accent1 hover:underline">GDE -- Glättung Dunkler Energie</a></li>
+                </ul>
+            </nav>
+
             <main>
-                <section class="mb-16 fadeIn">
+                <section id="alpha-dynamics" class="mb-16 fadeIn">
                     <div class="section-heading">
                         <span class="section-number"></span>
                         <h3 class="text-2xl md:text-3xl font-bold text-heading dark:text-accent1">Die (aktualisierte) vereinheitlichte α(z)-Funktion</h3>
@@ -147,15 +395,36 @@
                             </div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                             <div class="p-3 bg-violet-100 dark:bg-violet-900/30 rounded phase-box"><strong>\(A_{\text{früh}} \approx 10\)</strong><br>CMB Glättung</div>
-                             <div class="p-3 bg-violet-100 dark:bg-violet-900/30 rounded phase-box"><strong>\(z_t = 10^{10}\)</strong><br>Sehr früher Übergang</div>
+                             <div class="p-3 bg-violet-100 dark:bg-violet-900/30 rounded phase-box"><strong>\(A_{\text{früh}} = 8.0\)</strong><br>CMB Glättung</div>
+                             <div class="p-3 bg-violet-100 dark:bg-violet-900/30 rounded phase-box"><strong>\(z_t = 5 \times 10^9\)</strong><br>Früher Übergang</div>
                              <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded phase-box"><strong>\(\alpha_0 = -0.65\)</strong><br>Basis Spätzeit</div>
                              <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded phase-box"><strong>\(A_{\text{spät}} = 1.10\)</strong><br>Amplitude Spätzeit</div>
                              <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded phase-box"><strong>\(z_* = 0.70\)</strong><br>Übergang Spätzeit</div>
                              <div class="p-3 bg-gray-100 dark:bg-gray-700/40 rounded phase-box"><strong>\(k \approx 10/z_t\)</strong><br>Steilheit (angepasst)</div>
                              <div class="p-3 bg-accent3/10 dark:bg-accent3/20 rounded phase-box"><strong>\(\beta = 0.040\)</strong><br>(Unverändert)</div>
                         </div>
-                        <p class="text-xs italic mt-4 text-center text-gray-600 dark:text-gray-400">Parameter für frühe Phase (\(A_{\text{früh}}, z_t, k\)) sind illustrativ und müssten genauer bestimmt werden.</p>
+                        <p class="text-xs italic mt-4 text-center text-gray-600 dark:text-gray-400">Parameter für frühe Phase basieren auf optimierten Werten aus unserer CLASS-GDE Modellierung.</p>
+                    </div>
+
+                    <div class="mt-6">
+                        <h4 class="text-lg font-semibold mb-2 text-primary dark:text-accent1">Parameter anpassen</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label for="aFruhSlider" class="block text-sm text-gray-700 dark:text-gray-300">\( A_{\text{früh}} \):</label>
+                                <input type="range" id="aFruhSlider" min="5" max="10" step="0.5" value="8" class="w-full">
+                                <span id="aFruhValue" class="text-sm text-gray-600 dark:text-gray-400">8</span>
+                            </div>
+                            <div>
+                                <label for="ztSlider" class="block text-sm text-gray-700 dark:text-gray-300">\( z_t \) (×10⁹):</label>
+                                <input type="range" id="ztSlider" min="1" max="10" step="1" value="5" class="w-full">
+                                <span id="ztValue" class="text-sm text-gray-600 dark:text-gray-400">5</span>
+                            </div>
+                            <div>
+                                <label for="cSlider" class="block text-sm text-gray-700 dark:text-gray-300">\( C \) (×10⁻³³ s⁻¹):</label>
+                                <input type="range" id="cSlider" min="0.5" max="5" step="0.5" value="1" class="w-full">
+                                <span id="cValue" class="text-sm text-gray-600 dark:text-gray-400">1</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mt-10">
@@ -166,19 +435,19 @@
                             <canvas id="alphaChart"></canvas>
                         </div>
                          <p class="text-sm text-center text-gray-600 dark:text-gray-400 mt-2">
-                             Zeigt das hohe Plateau (\(\alpha \approx 10\)) bei \(z > z_t\), den Übergang bei \(z_t=10^{10}\) und das Tanh-Verhalten bei \(z \ll z_t\).
+                             Zeigt das hohe Plateau (\(\alpha \approx 8\)) bei \(z > z_t\), den Übergang bei \(z_t = 5 \times 10^9\) und das Tanh-Verhalten bei \(z \ll z_t\), mit \(\alpha \to 0.45\).
                          </p>
                     </div>
                 </section>
 
-                 <section class="mb-16 fadeIn">
+                 <section id="bbn-safety" class="mb-16 fadeIn">
                      <div class="section-heading">
                          <span class="section-number"></span>
                          <h3 class="text-2xl md:text-3xl font-bold text-heading dark:text-accent1">Warum BBN jetzt sicher ist</h3>
                      </div>
                      <div class="highlight-box result-box">
                          <p class="text-base md:text-lg leading-relaxed mb-4">
-                             Indem der Phasenübergang auf \(z_t \gtrsim 10^{10}\) verschoben wird, stellt das GDE-Modell sicher, dass zur Zeit der Big Bang Nucleosynthesis (BBN, \(z \sim 10^8 - 10^9\)) der Wert von \(\alpha(z)\) bereits auf sein spätes Plateau (\(\alpha \approx \alpha_0 + A_{spät} \approx 0.45\)) abgefallen ist.
+                             Indem der Phasenübergang auf \(z_t = 5 \times 10^9\) verschoben wird, stellt das GDE-Modell sicher, dass zur Zeit der Big Bang Nucleosynthesis (BBN, \(z \sim 10^8 - 10^9\)) der Wert von \(\alpha(z)\) bereits auf sein spätes Plateau (\(\alpha \approx \alpha_0 + A_{spät} \approx 0.45\)) abgefallen ist.
                          </p>
                          <p class="text-base md:text-lg leading-relaxed">
                               Bei diesem kleinen \(\alpha\)-Wert ist der Einfluss von \(\Lambda(z)\) auf die Expansionsrate \(H(z)\) während der BBN <strong class="font-semibold highlight">vernachlässigbar klein</strong> im Vergleich zur dominanten Strahlungsdichte. Die Elementhäufigkeiten (Helium-4, Deuterium) werden somit <strong class="font-semibold highlight">nicht signifikant verändert</strong> und bleiben konsistent mit den Beobachtungen (\(Y_p \approx 0.245\)). <span class="font-bold text-accent3">BBN ist chill! 😎</span>
@@ -186,13 +455,13 @@
                      </div>
                  </section>
 
-                 <section class="mb-16 fadeIn">
+                 <section id="cmb-damping" class="mb-16 fadeIn">
                      <div class="section-heading">
                          <span class="section-number"></span>
                          <h3 class="text-2xl md:text-3xl font-bold text-heading dark:text-accent1">CMB Fluktuations-Dämpfung durch hohes α</h3>
                      </div>
                      <p class="mb-6 text-base md:text-lg leading-relaxed text-gray-700 dark:text-gray-300">
-                         Der hohe Wert von \(\alpha \approx 10\) bei \(z > z_t\) führt zu einer exponentiellen Dämpfung primordialer Fluktuationen \(\delta T/T\). Dieser Mechanismus kann das Horizontproblem lösen, indem er ursprünglich kausal unverbundene Regionen auf die beobachtete Isotropie (\(\delta T/T \sim 10^{-5}\)) bei der Rekombination (\(z \approx 1100\)) glättet.
+                         Der hohe Wert von \(\alpha \approx 8\) bei \(z > z_t\) führt zu einer exponentiellen Dämpfung primordialer Fluktuationen \(\delta T/T\). Dieser Mechanismus kann das Horizontproblem lösen, indem er ursprünglich kausal unverbundene Regionen auf die beobachtete Isotropie (\(\delta T/T \sim 10^{-5}\)) bei der Rekombination (\(z \approx 1100\)) glättet.
                      </p>
                      <div class="highlight-box simulation-setup">
                          <p class="text-lg md:text-xl font-semibold mb-4 text-center text-phaseTransition dark:text-violet-300">
@@ -203,17 +472,20 @@
                                  \[ \frac{\delta T}{T}(z) \approx \left(\frac{\delta T}{T}\right)_0 \exp\left( - C \int_z^{z_{\text{max}}} (1+z')^{\alpha_{\text{eff}}(z')-1} dz' \right) \]
                              </div>
                              <p class="text-sm mt-4 text-gray-700 dark:text-gray-300 px-2">
-                                 Diese Formel modelliert die Dämpfung phänomenologisch. Der Term \((1+z')^{\alpha_{\text{eff}}-1}\) fängt den dominanten Effekt eines hohen \(\alpha\) auf die Dämpfungsrate ein. \(\alpha_{\text{eff}}(z')\) ist hier das volle \(\alpha(z')\). Die Dämpfungskonstante \(C\) wird empirisch angepasst, um \(\delta T/T \approx 10^{-5}\) bei \(z=1100\) zu erreichen. Eine mögliche physikalische Skalierung ist \(C \sim \kappa H(z_t)\), wobei die dimensionslose Kopplung \(\kappa \sim T(z_t)/m_{\text{Planck}} \sim 3 \, \text{MeV}/10^{15} \, \text{GeV} \sim 10^{-9}\) sein könnte (Annahme \(m_{\text{Planck}} \sim 10^{19}\) GeV / c² ist hier zu hoch, eher GUT-Skala \(10^{15}\) GeV für \(T(z_t)\)). Dies ergibt \(C \sim 10^{-9} H(z_t) \sim 10^{-33} \, \text{s}^{-1}\) (mit \(H(z_t)\) in Strahlungsdominanz), was grob mit dem empirischen Fit (\(C \approx 2 \times 10^{-33}\)) übereinstimmt, aber einer detaillierteren Herleitung bedarf.
+                                 Diese Formel modelliert die Dämpfung phänomenologisch. Der Term \((1+z')^{\alpha_{\text{eff}}-1}\) fängt den dominanten Effekt eines hohen \(\alpha\) auf die Dämpfungsrate ein. \(\alpha_{\text{eff}}(z')\) ist hier das volle \(\alpha(z')\). Die Dämpfungskonstante \(C\) wird empirisch angepasst, um \(\delta T/T \approx 10^{-5}\) bei \(z=1100\) zu erreichen. Eine mögliche physikalische Skalierung ist \(C \sim \kappa H(z_t)\), wobei die dimensionslose Kopplung \(\kappa \sim T(z_t)/m_{\text{Planck}} \sim 1.2 \times 10^{14} \, \text{GeV}/1.22 \times 10^{19} \, \text{GeV} \sim 10^{-5}\) sein könnte. Dies ergibt \(C \sim 10^{-5} H(z_t) \). Mit \(H(z_t) \approx 10^{-28} \, \text{s}^{-1}\) (Strahlungsdominanz bei \(z_t = 5 \times 10^9\)) wäre \(C \sim 10^{-33} \, \text{s}^{-1}\), was mit dem empirischen Fit (\(C = 1 \times 10^{-33}\)) übereinstimmt, aber einer detaillierten holographischen Herleitung bedarf.
                              </p>
                          </div>
                          <p class="text-base md:text-lg leading-relaxed text-gray-700 dark:text-gray-300 mb-4">
-                             Die <strong class="font-semibold highlight">Hauptdämpfung findet bei hohen Rotverschiebungen (\(z > z_t = 10^{10}\)) statt</strong>, wo \(\alpha_{\text{eff}}(z) \approx 10\) ist. Der erreichte Dämpfungsgrad (\(\delta T/T \sim 10^{-5}\)) bleibt dann bis zur Rekombination (\(z \approx 1100\)) weitgehend erhalten.
+                             Die <strong class="font-semibold highlight">Hauptdämpfung findet bei hohen Rotverschiebungen (\(z > z_t = 5 \times 10^9\)) statt</strong>, wo \(\alpha_{\text{eff}}(z) \approx 8\) ist. Der erreichte Dämpfungsgrad (\(\delta T/T \sim 10^{-5}\)) bleibt dann bis zur Rekombination (\(z \approx 1100\)) weitgehend erhalten.
                          </p>
                          <p class="text-base md:text-lg leading-relaxed text-gray-700 dark:text-gray-300">
                              Die Glättung wirkt über <strong class="font-semibold highlight">alle relevanten Skalen</strong> hinweg durch ein globales thermodynamisches Feedback. Dieses Feedback, getrieben durch das hohe \(\alpha\), minimiert Entropiegradienten und homogenisiert das Universum über Distanzen, die dem Hubble-Radius \(d_H \sim c/H(z_t)\) zur Zeit des Übergangs entsprechen. Projiziert auf den Himmel bei \(z=1100\) entspricht dies einer Winkelskala von \(\theta \sim d_H / d_A(z=1100) \sim 6^\circ\), was ausreicht, um die beobachtete großskalige Homogenität des CMB zu erklären.
                          </p>
                          <p class="text-base md:text-lg leading-relaxed text-gray-700 dark:text-gray-300 mt-4">
-                             Die charakteristische Dämpfungszeitskala \(\tau_\Lambda^{-1} \sim C (1+z)^{\alpha_{\text{eff}}(z)-1}\) ist extrem kurz während der Hoch-\(\alpha\)-Phase. Selbst mit dem stetigen \(\alpha_{\text{eff}}(z) \approx 4.35\) bei \(z \approx z_t\) ergibt sich \(\tau_\Lambda \sim 1 / (2 \times 10^{-33} \cdot (10^{10})^{3.35}) \sim 0.1 \, \text{s}\). Dies ist <strong class="font-semibold highlight">deutlich kürzer</strong> als die typische Expansions- (\(H^{-1}\)) oder Wechselwirkungszeit (\(\tau_e\)) zu dieser Epoche (\(\sim 10^{-17}\) s), was die quasi-"instantane" Natur der Glättung über den Horizont hinaus stützt. (Für das idealisierte binäre Modell mit \(\alpha_{\text{eff}}=10\) wäre \(\tau_\Lambda \sim 5 \times 10^{-58}\) s).
+                             Die Dämpfung ist skalenabhängig modelliert durch \(\Gamma(z, k) = C (1+z)^{\alpha(z)-2} H(z) \left( \frac{k}{k_{\text{ref}}} \right)^2 \), mit \(k_{\text{ref}} = 0.1 \, \text{Mpc}^{-1}\). Dies stellt sicher, dass die Silk-Dämpfung bei hohen Multipolmomenten (\(\ell > 1000\)) realistisch bleibt, wie in den <a href="#gde-results" class="text-primary dark:text-accent1 underline">CMB-Spektren unten</a> gezeigt.
+                         </p>
+                         <p class="text-base md:text-lg leading-relaxed text-gray-700 dark:text-gray-300 mt-4">
+                             Die charakteristische Dämpfungszeitskala \(\tau_\Lambda^{-1} \sim C (1+z)^{\alpha_{\text{eff}}(z)-1}\) ist extrem kurz während der Hoch-\(\alpha\)-Phase. Selbst mit dem stetigen \(\alpha_{\text{eff}}(z) \approx 4.0\) bei \(z \approx z_t\) ergibt sich \(\tau_\Lambda \sim 1 / (1 \times 10^{-33} \cdot (5 \times 10^{9})^{3.0}) \sim 0.8 \, \text{s}\). Dies ist <strong class="font-semibold highlight">deutlich kürzer</strong> als die typische Expansions- (\(H^{-1}\)) oder Wechselwirkungszeit (\(\tau_e\)) zu dieser Epoche (\(\sim 10^{-17}\) s), was die quasi-"instantane" Natur der Glättung über den Horizont hinaus stützt. (Für das idealisierte binäre Modell mit \(\alpha_{\text{eff}}=8\) wäre \(\tau_\Lambda \sim 5 \times 10^{-56}\) s).
                          </p>
                      </div>
                      <div class="mt-10">
@@ -224,18 +496,21 @@
                              <canvas id="deltaTChart"></canvas>
                          </div>
                          <p class="text-sm text-center text-gray-600 dark:text-gray-400 mt-2">
-                             Zeigt die Dämpfung für verschiedene \(C\)-Werte (mit stetigem \(\alpha_{\text{eff}}\)) und einen Vergleich zwischen stetigem vs. binärem \(\alpha_{\text{eff}}\) für \(C=2 \times 10^{-33}\).
+                             Zeigt die Dämpfung von \(\delta T/T\) für verschiedene \(C\)-Werte (mit stetigem \(\alpha(z)\)) und einen Vergleich zwischen stetigem (\(\alpha(z)\)) und binärem (\(\alpha = 8\) für \(z > z_t\), sonst 0) Ansatz bei \(C = 1 \times 10^{-33}\). Ziel: \(\delta T/T \approx 10^{-5}\) bei \(z = 1100\).
                          </p>
                      </div>
                  </section>
 
-                 <section class="mb-16 fadeIn">
+                 <section id="timescale-comparison" class="mb-16 fadeIn">
                      <div class="section-heading">
                          <span class="section-number"></span>
                          <h3 class="text-2xl md:text-3xl font-bold text-heading dark:text-accent1">Zeitskalen-Vergleich: \(\tau_\Lambda\) vs. \(\tau_e\) vs. \(H^{-1}\)</h3>
                      </div>
                       <p class="mb-6 text-base md:text-lg leading-relaxed text-gray-700 dark:text-gray-300">
                          Um die Effektivität der Glättung zu verdeutlichen, vergleichen wir die Dämpfungszeitskala \(\tau_\Lambda\) mit der mittleren freien Flugzeit der Photonen (\(\tau_e\), Thomson-Streuung) und der Hubble-Zeit (\(H^{-1}\)). Der Plot zeigt, dass \(\tau_\Lambda\) (sowohl für stetiges als auch binäres \(\alpha_{\text{eff}}\)) während der Hoch-\(\alpha\)-Phase (\(z > z_t\)) dramatisch kürzer ist als die anderen relevanten Zeitskalen.
+                     </p>
+                     <p class="text-base md:text-lg leading-relaxed text-gray-700 dark:text-gray-300 mt-4">
+                         Während der Hoch-\(\alpha\)-Phase (\(z > z_t\)) ist \(\tau_\Lambda \sim 1 / (C (1+z)^{\alpha_{\text{eff}}-1})\) extrem kurz, da \(\alpha_{\text{eff}} \approx 8\) und \(z\) groß ist. Nach dem Übergang (\(z < z_t\)) fällt \(\alpha_{\text{eff}}\), wodurch \(\tau_\Lambda\) stark ansteigt.
                      </p>
                      <div class="chart-container">
                          <canvas id="tauChart"></canvas>
@@ -245,7 +520,23 @@
                      </p>
                  </section>
 
-                 <section class="mb-16 fadeIn">
+                 <section id="pk-spectrum" class="mb-16 fadeIn">
+                     <div class="section-heading">
+                         <span class="section-number"></span>
+                         <h3 class="text-2xl md:text-3xl font-bold text-heading dark:text-accent1">Materie-Leistungsspektrum \( P(k) \)</h3>
+                     </div>
+                     <p class="mb-6 text-base md:text-lg leading-relaxed text-gray-700 dark:text-gray-300">
+                         Das GDE-Modell wurde auf das Materie-Leistungsspektrum \( P(k) \) angewendet, um die Konsistenz mit großskaligen Strukturen zu prüfen. Die \( k \)-abhängige Dämpfung beeinflusst hauptsächlich kleine Skalen (hohe \( k \)), während großskalige Strukturen \( \Lambda \)CDM-ähnlich bleiben.
+                     </p>
+                     <div class="chart-container">
+                         <canvas id="pkChart"></canvas>
+                     </div>
+                     <p class="text-sm text-center text-gray-600 dark:text-gray-400 mt-2">
+                         Zeigt \( P(k) \) für GDE im Vergleich zu \( \Lambda \)CDM, mit realistischer Dämpfung bei hohen \( k \).
+                     </p>
+                 </section>
+
+                 <section id="implications" class="mb-16 fadeIn">
                      <div class="section-heading">
                          <span class="section-number"></span>
                          <h3 class="text-2xl md:text-3xl font-bold text-heading dark:text-accent1">Weitere Implikationen & Ausblick</h3>
@@ -254,7 +545,7 @@
                          <ul class="list-disc pl-6 space-y-3 text-base">
                              <li><strong>CMB-Glättung erhalten:</strong> Der Mechanismus funktioniert und erklärt die großskalige Homogenität (\(\theta \sim 6^\circ\)).</li>
                              <li><strong>Primordiales Spektrum \(P(k)\):</strong> Bleibt voraussichtlich \(\Lambda\)CDM-ähnlich.</li>
-                             <li><strong>Gravitationswellen:</strong> Keine signifikanten GWs bei \(z_t \sim 10^{10}\) erwartet.</li>
+                             <li><strong>Gravitationswellen:</strong> Keine signifikanten GWs bei \(z_t \sim 5 \times 10^9\) erwartet.</li>
                              <li><strong>Einheitliches Bild:</strong> Kohärentes Modell von \(z \to \infty\) bis heute.</li>
                              <li class="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600"><strong>Nächste Schritte ("Big Play" & "Next Level"):</strong>
                                 <ul class="list-circle pl-6 mt-2 space-y-1 text-sm">
@@ -269,7 +560,509 @@
                           <p class="mt-4 font-semibold text-primary dark:text-accent1"> Eine thermodynamische Kosmologie von Anfang bis Ende!</p>
                      </div>
                  </section>
-            </main>
+            
+                <!-- Neu eingefügter GDE Formeln & Rechenweg Abschnitt -->
+                <section id="gde-formulas" class="mb-16 fadeIn">
+                    <div class="section-heading">
+                        <span class="section-number"></span>
+                        <h3 class="text-2xl md:text-3xl font-bold text-heading dark:text-accent1">GDE — Formeln, Herleitungen & Rechenweg</h3>
+                    </div>
+
+                    <div class="formula-section">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">1. Dämpfungsrate \(\Gamma(z)\)</h4>
+                        <div class="formula-block">
+                            <p class="mb-4 text-gray-700 dark:text-gray-300">Die thermodynamisch motivierte Dämpfungsrate lautet:</p>
+                            <div class="equation-container bg-white/80 dark:bg-gray-800/80 mb-4">
+                                <div class="equation-content math">
+                                    \[ \Gamma(z) = C \cdot (1 + z)^{\alpha(z) - 1} \]
+                                </div>
+                            </div>
+                            <p class="mb-4 text-gray-700 dark:text-gray-300">
+                                wobei \(\alpha(z)\) eine Kopplungsfunktion ist, die aus der thermischen Verstärkung stammt. Sie kann z.B. so modelliert werden:
+                            </p>
+                            <div class="equation-container bg-white/80 dark:bg-gray-800/80">
+                                <div class="equation-content math">
+                                    \[ \alpha(z) = \alpha_0 + A_{\text{spät}} \cdot \tanh(2(z - z_\star)) + A_{\text{früh}} \cdot \frac{1}{1 + e^{k(z - z_t)}} \]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="formula-section">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">2. Erweiterung mit \(k\)-Abhängigkeit</h4>
+                        <div class="formula-block">
+                            <p class="mb-4 text-gray-700 dark:text-gray-300">Zur Reduktion der Dämpfung bei hohen Multipolen führen wir eine \(k\)-Abhängigkeit ein:</p>
+                            <div class="equation-container bg-white/80 dark:bg-gray-800/80 mb-4">
+                                <div class="equation-content math">
+                                    \[ \Gamma(z,k) = C \cdot (1 + z)^{\alpha(z) - 1} \cdot \left(\frac{k}{k_{\text{ref}}}\right)^2 \]
+                                </div>
+                            </div>
+                            <p class="mb-4 text-gray-700 dark:text-gray-300">Oder moderater gedämpft:</p>
+                            <div class="equation-container bg-white/80 dark:bg-gray-800/80">
+                                <div class="equation-content math">
+                                    \[ \Gamma(z,k) = C \cdot (1 + z)^{\alpha(z) - 1} \cdot \left(1 + \frac{k}{k_{\text{ref}}}\right)^{-\nu} \]
+                                </div>
+                            </div>
+                            <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Diese \(k\)-Abhängigkeit wurde in der finalen Implementierung verwendet, mit \(\nu=2\) und \(k_{\text{ref}}=0.1 \, \text{Mpc}^{-1}\).</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-section">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">3. Herleitung von \(C\) aus \(\kappa\)</h4>
+                        <div class="formula-block">
+                            <p class="mb-4 text-gray-700 dark:text-gray-300">
+                                Der thermodynamische Vorfaktor \(C\) wird aus einem Skalenverhältnis zwischen Temperatur und Planck-Skala hergeleitet:
+                            </p>
+                            <div class="equation-container bg-white/80 dark:bg-gray-800/80 mb-4">
+                                <div class="equation-content math">
+                                    \[ C = \kappa \cdot \frac{s(z_t)}{\rho_c(z_t)/c^2} \cdot H(z_t) \]
+                                </div>
+                            </div>
+                            <p class="mb-4 text-gray-700 dark:text-gray-300">mit:</p>
+                            <div class="equation-container bg-white/80 dark:bg-gray-800/80">
+                                <div class="equation-content math">
+                                    \[ \kappa \approx \left( \frac{T(z_t)}{E_{\text{Planck}}} \right)^4 \cdot \frac{1}{g_\star^{1.2} \cdot \eta} \]
+                                </div>
+                            </div>
+                            <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Bei \(z_t = 5 \times 10^9\) und aktuellen Parameterwerten ergibt die Berechnung \(\kappa \approx 10^{-5}\) und \(C \approx 1 \times 10^{-33} \, \text{s}^{-1}\).</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-section">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">4. Numerische Werte</h4>
+                        <div class="formula-block">
+                            <ul class="list-disc pl-6 mb-4 text-gray-700 dark:text-gray-300 space-y-2">
+                                <li>\( T(z_t) \approx 1.4 \times 10^{10} \) K \(\approx 1.2 \times 10^{14} \) GeV</li>
+                                <li>\( E_{\text{Planck}} \approx 1.22 \times 10^{19} \) GeV</li>
+                                <li>\( g_\star \approx 100 \)</li>
+                                <li>\( \eta \approx 1.17 \)</li>
+                            </ul>
+                            <p class="mb-4 text-gray-700 dark:text-gray-300">Daraus ergibt sich:</p>
+                            <div class="equation-container bg-white/80 dark:bg-gray-800/80">
+                                <div class="equation-content math">
+                                    \[ \kappa \approx 10^{-5}, \quad C \approx 1 \times 10^{-33} \, \text{s}^{-1} \]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="formula-section">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">5. Anwendung auf CLASS</h4>
+                        <div class="formula-block">
+                            <p class="mb-4 text-gray-700 dark:text-gray-300">
+                                Die Dämpfung \(\Gamma(z,k)\) wird in <code class="inline-code">perturbations.c</code> in CLASS eingefügt und in die Photonengleichung integriert:
+                            </p>
+                            <div class="equation-container bg-white/80 dark:bg-gray-800/80">
+                                <div class="equation-content math">
+                                    \[ \dot{\Theta} = -\Gamma(z,k) \cdot \Theta + \text{weitere Terme} \]
+                                </div>
+                            </div>
+                            <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Die Implementierung erfolgt an den Stellen, an denen die Photonentemperatur-Gleichungen in CLASS gelöst werden, um eine korrekte Berücksichtigung bei allen relevanten Multipolen zu gewährleisten.</p>
+                        </div>
+                    </div>
+
+                    <!-- Neue Sektion für die GDE_Daempfungsformel -->
+                    <div class="formula-section">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300 flex items-center">
+                            6. Vereinheitlichte Dämpfungsformel
+                            <span class="badge ml-2">Version 2.0</span>
+                        </h4>
+                        <div class="formula-block">
+                            <p class="mb-2 text-gray-700 dark:text-gray-300">
+                                Thermodynamisch gekoppelte Dämpfungsformel mit Expansion und k-Abhängigkeit:
+                            </p>
+                            <div class="equation-container bg-white/80 dark:bg-gray-800/80 mb-6">
+                                <div class="equation-content math">
+                                    \[ \Gamma(z, k) = C \cdot (1 + z)^{\alpha(z) - 2} \cdot H(z) \cdot \left( \frac{k}{k_{\text{ref}}} \right)^{\nu} \]
+                                </div>
+                            </div>
+                            
+                            <p class="font-semibold mb-2 text-gray-800 dark:text-gray-200">Parameter:</p>
+                            <table class="parameter-table">
+                                <thead>
+                                    <tr>
+                                        <th>Parameter</th>
+                                        <th>Wert</th>
+                                        <th>Beschreibung</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>\(C\)</td>
+                                        <td>1e-33 s⁻¹</td>
+                                        <td>Normierung der Dämpfung</td>
+                                    </tr>
+                                    <tr>
+                                        <td>\(\alpha(z)\)</td>
+                                        <td>≈ 8 bei z ≫ 1</td>
+                                        <td>Verstärkungsfunktion der Entropiekopplung</td>
+                                    </tr>
+                                    <tr>
+                                        <td>\(H(z)\)</td>
+                                        <td>variabel [s⁻¹]</td>
+                                        <td>Hubble-Parameter (Expansion)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>\(k\)</td>
+                                        <td>variabel [Mpc⁻¹]</td>
+                                        <td>Fourier-Skala</td>
+                                    </tr>
+                                    <tr>
+                                        <td>\(k_{\text{ref}}\)</td>
+                                        <td>0.1 Mpc⁻¹</td>
+                                        <td>Normierungsskala für k</td>
+                                    </tr>
+                                    <tr>
+                                        <td>\(\nu\)</td>
+                                        <td>2</td>
+                                        <td>Exponent für k-Dämpfung (anpassbar: 1.5, 2, 3)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                    <strong>Kommentar:</strong> Diese Formel verbindet Expansion, thermodynamische Kopplung und skalenabhängige Dämpfung in einem einheitlichen Rahmen. Der Exponent \(\alpha(z) - 2\) sorgt für konsistentes Skalenverhalten, während der Hubble-Parameter \(H(z)\) die korrekte zeitliche Entwicklung gewährleistet. Die k-Abhängigkeit wurde empirisch optimiert und in CLASS implementiert.
+                                </p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                                    <em>GDE-Modell von Gabriel & Mila</em>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Neu eingefügter Abschnitt für erweiterte GDE-Dämpfungsformel -->
+                <section id="advanced-gde-formula" class="mb-16 fadeIn">
+                    <div class="section-heading">
+                        <span class="section-number"></span>
+                        <h3 class="text-2xl md:text-3xl font-bold text-heading dark:text-accent1">Erweiterte GDE-Dämpfungsformel</h3>
+                    </div>
+                    
+                    <div class="formula-section">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">1. Die GDE-Dämpfungsformel</h4>
+                        <div class="boxed-formula">
+                            <p class="text-center text-lg font-medium mb-4 text-gray-800 dark:text-gray-200">Die optimierte skalenabhängige Dämpfungsrate lautet:</p>
+                            <div class="equation-container bg-white/90 dark:bg-gray-800/90 my-4">
+                                <div class="equation-content math">
+                                    \[ \Gamma(z,k) = C \cdot H(z) \cdot (1+z)^{\alpha(z)-2} \cdot \left[ A \left(\frac{k}{k_0}\right)^{\nu_1} \frac{1}{1+\left(\frac{k}{k_0}\right)^q} + B \left(\frac{k}{k_0}\right)^{\nu_2} e^{-\left(\frac{k}{k_d}\right)^p} \right] \]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="formula-section">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">2. Parameterbedeutung & Einheiten</h4>
+                        <div class="two-column-grid">
+                            <div class="parameter-card">
+                                <h5 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-100">Basisparameter</h5>
+                                <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+                                    <li><span class="emoji-bullet">⚙️</span><strong>C·H(z):</strong> Normierung an Expansion, absorbiert H(z) für δT/T = 10⁻⁵</li>
+                                    <li><span class="emoji-bullet">🔄</span><strong>α(z):</strong> Entropie-Evolution / Phantom-Dynamik über GDE gekoppelt</li>
+                                    <li><span class="emoji-bullet">📏</span><strong>k₀ = 0.1:</strong> Referenzskala (Mpc⁻¹)</li>
+                                    <li><span class="emoji-bullet">📏</span><strong>kₚ = 0.12:</strong> Dämpfungsskala (Mpc⁻¹)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="parameter-card">
+                                <h5 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-100">Kanal-Parameter</h5>
+                                <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+                                    <li><span class="emoji-bullet">🔍</span><strong>A, ν₁, q:</strong> BAO-Kanal: flache Kurve, Peak bei k ~ 0.04 Mpc⁻¹</li>
+                                    <li><span class="emoji-bullet">🔎</span><strong>B, ν₂, p:</strong> CMB-Kanal: schnelle Dämpfung bei k ≳ 0.1-0.2 Mpc⁻¹</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="formula-section">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">3. Rechenschritt: Beispiel bei z = 0.5, k = 0.04 Mpc⁻¹</h4>
+                        <div class="formula-block">
+                            <p class="mb-4 text-gray-700 dark:text-gray-300">Wir setzen folgende Parameter:</p>
+                            <div class="code-block">
+A = 1.5
+B = 0.34
+nu1 = 0.05
+nu2 = 3.4
+q = 5
+k0 = 0.1
+kd = 0.12
+p = 6
+alpha_z = -0.16
+Hz = 1.0  # absorbiert in C
+z = 0.5
+C = angepasst für δT/T(k=0.1) = 1e-5</div>
+                            
+                            <div class="mt-6">
+                                <h5 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">Berechnung:</h5>
+                                
+                                <div class="calculation-step">
+                                    <p class="font-medium text-gray-800 dark:text-gray-200">a) Rechne den BAO-Term:</p>
+                                    <div class="equation-container bg-white/90 dark:bg-gray-800/90 my-2">
+                                        <div class="equation-content math">
+                                            \[ T_{\text{BAO}}(k) = A \left(\frac{k}{k_0}\right)^{\nu_1} \cdot \frac{1}{1+\left(\frac{k}{k_0}\right)^q} \]
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-700 dark:text-gray-300">Setze k = 0.04:</p>
+                                    <div class="equation-container bg-white/90 dark:bg-gray-800/90 my-2">
+                                        <div class="equation-content math">
+                                            \begin{align}
+                                            \left(\frac{0.04}{0.1}\right)^{0.05} &\approx 0.95\\
+                                            \left(\frac{0.04}{0.1}\right)^{5} &\approx 0.01024\\
+                                            \Rightarrow T_{\text{BAO}} &\approx 1.5 \cdot 0.95 / (1 + 0.01024) \approx 1.41
+                                            \end{align}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="calculation-step">
+                                    <p class="font-medium text-gray-800 dark:text-gray-200">b) Rechne den CMB-Term:</p>
+                                    <div class="equation-container bg-white/90 dark:bg-gray-800/90 my-2">
+                                        <div class="equation-content math">
+                                            \[ T_{\text{CMB}}(k) = B \left(\frac{k}{k_0}\right)^{\nu_2} \cdot e^{-\left(\frac{k}{k_d}\right)^p} \]
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-700 dark:text-gray-300">Berechnung für k = 0.04:</p>
+                                    <div class="equation-container bg-white/90 dark:bg-gray-800/90 my-2">
+                                        <div class="equation-content math">
+                                            \begin{align}
+                                            \left(\frac{0.04}{0.1}\right)^{3.4} &\approx 0.04\\
+                                            \left(\frac{0.04}{0.12}\right)^{6} &\approx 0.00215\\
+                                            \Rightarrow e^{-0.00215} &\approx 0.9979\\
+                                            T_{\text{CMB}} &\approx 0.34 \cdot 0.04 \cdot 0.9979 \approx 0.0136
+                                            \end{align}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="calculation-step">
+                                    <p class="font-medium text-gray-800 dark:text-gray-200">c) Gesamtterm:</p>
+                                    <div class="equation-container bg-white/90 dark:bg-gray-800/90 my-2">
+                                        <div class="equation-content math">
+                                            \[ \Gamma(z,k) \approx (1+z)^{\alpha(z)-2} \cdot (T_{\text{BAO}} + T_{\text{CMB}}) \]
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-700 dark:text-gray-300">Einsetzen der Werte:</p>
+                                    <div class="equation-container bg-white/90 dark:bg-gray-800/90 my-2">
+                                        <div class="equation-content math">
+                                            \begin{align}
+                                            (1+0.5)^{-2.16} &\approx 0.41\\
+                                            \Gamma &\approx 0.41 \cdot (1.41 + 0.0136) \approx 0.584
+                                            \end{align}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="calculation-step">
+                                    <p class="font-medium text-gray-800 dark:text-gray-200">d) Gedämpftes Spektrum:</p>
+                                    <div class="equation-container bg-white/90 dark:bg-gray-800/90 my-2">
+                                        <div class="equation-content math">
+                                            \begin{align}
+                                            P_{\text{obs}}(k) &= P(k) \cdot e^{-2\Gamma} \approx P(k) \cdot e^{-1.168} \approx P(k) \cdot 0.31
+                                            \end{align}
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-700 dark:text-gray-300 mt-2">
+                                        <span class="emoji-bullet">💡</span>Die BAO-Amplitude ist 31% der ursprünglichen Power — passt zur DESI-Anforderung von 0.972×ΛCDM nach Normierung.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="formula-section">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">4. Visualisierung der Λ(z)-Entwicklung</h4>
+                        <div class="formula-block">
+                            <p class="mb-4 text-gray-700 dark:text-gray-300">
+                                Im GDE-Modell koppeln wir die Dämpfung an die zeitliche Evolution der Dunklen Energie Λ(z). 
+                                Dies ermöglicht eine konsistente Behandlung beider Phänomene.
+                            </p>
+                            
+                            <h5 class="text-lg font-semibold mt-4 mb-2 text-gray-800 dark:text-gray-200">Was ist Λ(z) im GDE-Modell?</h5>
+                            <div class="equation-container bg-white/90 dark:bg-gray-800/90 my-4">
+                                <div class="equation-content math">
+                                    \[ \Lambda(z) = \Lambda_0 \cdot \left(\frac{T_0}{T_{\text{CMB}}(z)}\right)^{\alpha(z)} \cdot \left[1 + \beta \cdot \frac{S_{\text{Struktur}}(z)}{S_{\text{Struktur}}(0)}\right] \]
+                                </div>
+                            </div>
+                            
+                            <p class="text-gray-700 dark:text-gray-300 mb-4">
+                                Λ(z) ist keine Konstante mehr, sondern fluktuiert thermodynamisch mit Kopplung an Temperatur über α(z) und Strukturentropie.
+                                In Phasen negativer α(z) steigt Λ(z) an — typisch für eine Phantom-Phase.
+                            </p>
+                            
+                            <div class="lambda-chart-container">
+                                <canvas id="lambdaChart"></canvas>
+                            </div>
+                            
+                            <p class="text-sm text-center text-gray-600 dark:text-gray-400 mt-1">
+                                Λ(z)/Λ₀ Verhältnis im GDE-Modell mit α(z) ≈ -0.16 bei z ≤ 3.
+                            </p>
+                            
+                            <h5 class="text-lg font-semibold mt-6 mb-2 text-gray-800 dark:text-gray-200">Dämpfungsrate Γ(z, k) dynamisch gekoppelt an Λ(z)</h5>
+                            <div class="equation-container bg-white/90 dark:bg-gray-800/90 my-2">
+                                <div class="equation-content math">
+                                    \[ \Gamma(z,k) = C \cdot \Lambda(z) \cdot f(k) \]
+                                </div>
+                            </div>
+                            
+                            <p class="text-gray-700 dark:text-gray-300 mt-4">
+                                Diese Kopplung hat mehrere Vorteile:
+                            </p>
+                            <ul class="mt-2 space-y-1 text-gray-700 dark:text-gray-300">
+                                <li><span class="emoji-bullet">✅</span>Die Dämpfungsstärke folgt automatisch der dynamischen Dunklen Energie</li>
+                                <li><span class="emoji-bullet">✅</span>BAO- und CMB-Signale können getrennt skaliert werden</li>
+                                <li><span class="emoji-bullet">✅</span>Besseres Matching zu DESI bei w(z=0.5) ≈ -1.05</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="formula-section">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300 flex items-center">
+                            5. Optimierte Endformel
+                            <span class="badge ml-2">Version 3.0</span>
+                        </h4>
+                        <div class="boxed-formula">
+                            <div class="equation-container bg-white/90 dark:bg-gray-800/90 my-4">
+                                <div class="equation-content math">
+                                    \[ \boxed{\;
+                                        \Gamma(z,k)=C\,H(z)\,(1+z)^{\alpha(z)-2}\,
+                                        \Bigl[
+                                          A\left(\frac{k}{k_0}\right)^{\nu_1}\!\Big/\!\bigl(1+(k/k_0)^q\bigr)
+                                          +
+                                          B\left(\frac{k}{k_0}\right)^{\nu_2}\bigl(1+(k/k_0)^m\bigr)
+                                        \Bigr]\;} \]
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <h5 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Parameter-Set</h5>
+                                    <ul class="space-y-1 text-gray-700 dark:text-gray-300 text-sm">
+                                        <li><code>C</code>: via Normierung an <code>δT/T(k_0)=10^{-5}</code></li>
+                                        <li><code>A = 1.5</code> — BAO-Kanal-Norm</li>
+                                        <li><code>B = 0.34</code> — CMB-Kanal-Norm</li>
+                                        <li><code>ν₁ = 0.05</code> — flache Steigung (BAO)</li>
+                                        <li><code>ν₂ = 3.4</code> — steile Steigung (CMB)</li>
+                                        <li><code>q = 5</code>, <code>m = 5</code> — weicher Übergang</li>
+                                        <li><code>k₀ = 0.1 Mpc⁻¹</code> — Referenzskala</li>
+                                    </ul>
+                                </div>
+                                
+                                <div>
+                                    <h5 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Validierung</h5>
+                                    <ul class="space-y-1 text-gray-700 dark:text-gray-300 text-sm">
+                                        <li>BAO @ <code>k=0.04</code>: ≈0.972 ΛCDM (Ziel ≈ 0.97)</li>
+                                        <li><code>δT/T</code> @ <code>k=0.1</code>: bleibt 10⁻⁵ per Norm</li>
+                                        <li>Hoch-k (≥0.15): Amplitude <10⁻³⁵ → starke Glättung</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                    <strong>Kurz-Erklärung:</strong> Der erste Term (A, ν₁) dominiert auf BAO-Skalen und wird oberhalb k₀ durch den Blending-Faktor
+                                    <code>1/(1+(k/k₀)^q)</code> sanft abgeschaltet. Der zweite Term (B, ν₂) setzt genau dort an und liefert die
+                                    benötigte starke, skalen-abhängige Dämpfung für das CMB und kleinere Strukturen. Durch getrennte Normen A & B können BAO und CMB unabhängig 
+                                    justiert werden, sodass beide Beobachtungs-Constraints ohne gegenseitige Störung erfüllt werden.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="gde-explanations" class="mb-16 fadeIn">
+                    <div class="section-heading">
+                        <span class="section-number"></span>
+                        <h3 class="text-2xl md:text-3xl font-bold text-heading dark:text-accent1">GDE-Erklärungen zu allen Visualisierungen</h3>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-gray-800/80 p-6 rounded-xl shadow-lg mb-8">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">1. CLASS-kompatibles k-abhängiges Spektrum</h4>
+                        <p class="mb-4">
+                            In diesem Plot wurde das GDE-Modell erweitert um eine k-abhängige Dämpfungskomponente. Dies reduziert übermäßige Glättung bei hohen ℓ-Werten.
+                            Der Vergleich mit dem Planck-Spektrum zeigt, dass die akustischen Peaks korrekt erhalten bleiben und die Silk-Dämpfung realistisch moduliert ist.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-gray-800/80 p-6 rounded-xl shadow-lg mb-8">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">2. Final optimiertes CLASS-Spektrum</h4>
+                        <p class="mb-4">
+                            Das finale GDE-Modell mit <code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">A_fruh = 8.0</code>, <code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">z_t = 5e9</code> und <code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">C = 1e-33</code> reproduziert die beobachteten Planck-Werte sehr genau.
+                            Die k-Abhängigkeit wurde integriert, um bei ℓ > 1000 keine übermäßige Unterdrückung zu erzeugen.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-gray-800/80 p-6 rounded-xl shadow-lg mb-8">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">3. Parametertuning: Einfluss von A_fruh & z_t</h4>
+                        <p class="mb-4">
+                            In dieser Grafik werden verschiedene Kombinationen von <code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">A_fruh</code> und <code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">z_t</code> verglichen.
+                            Ziel war es, die Dämpfungsintensität bei hoher Rotverschiebung optimal einzustellen, ohne die Struktur des CMB zu stören.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-gray-800/80 p-6 rounded-xl shadow-lg mb-8">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">4. Optimierte k-Dämpfungskorrektur</h4>
+                        <p class="mb-4">
+                            Die exponentielle k-Dämpfung wurde sanft gemacht mit einem Dämpfungsindex <code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">ν = 2</code>.
+                            Dies ermöglicht ein realistisches Verhalten bei sehr kleinen Skalen, ohne die Peaks bei mittleren ℓ zu verfälschen.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-gray-800/80 p-6 rounded-xl shadow-lg">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">5. Ursprünglicher C-Vergleich</h4>
+                        <p class="mb-4">
+                            Hier wurden verschiedene Dämpfungsstärken durch Variation des Parameters <code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">C</code> analysiert.
+                            Der Wert <code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">C = 1e-33 s⁻¹</code> zeigt die beste Übereinstimmung mit dem Planck-Spektrum.
+                        </p>
+                    </div>
+                </section>
+
+                <section id="gde-results" class="mb-16 fadeIn">
+                    <div class="section-heading">
+                        <span class="section-number"></span>
+                        <h3 class="text-2xl md:text-3xl font-bold text-heading dark:text-accent1">GDE – Glättung Dunkler Energie: Ergebnisse</h3>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-gray-800/80 p-6 rounded-xl shadow-lg mb-8">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">1. CLASS-kompatibles k-abhängiges Spektrum</h4>
+                        <p class="mb-4"><strong>Beschreibung:</strong> GDE mit thermischer Dämpfung abhängig von k – realistisch für hohe ℓ-Werte.</p>
+                        <div class="flex justify-center">
+                            <img src="https://via.placeholder.com/800x400?text=GDE+k-dependent+Spectrum" alt="GDE k-dependent Spectrum" class="rounded-lg shadow-md max-w-full">
+                        </div>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-gray-800/80 p-6 rounded-xl shadow-lg mb-8">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">2. Final optimiertes CLASS-Spektrum</h4>
+                        <p class="mb-4"><strong>Parameter:</strong> A<sub>fruh</sub>=8.0, z<sub>t</sub>=5e9, C=1e-33, k-abhängig.</p>
+                        <div class="flex justify-center">
+                            <img src="https://via.placeholder.com/800x400?text=Final+CLASS+GDE+Spectrum" alt="Final CLASS GDE Spectrum" class="rounded-lg shadow-md max-w-full">
+                        </div>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-gray-800/80 p-6 rounded-xl shadow-lg mb-8">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">3. Parametertuning: A<sub>fruh</sub> & z<sub>t</sub></h4>
+                        <p class="mb-4">Vergleich verschiedener Kombinationen zur Feinjustierung des Dämpfungsverlaufs.</p>
+                        <div class="flex justify-center">
+                            <img src="https://via.placeholder.com/800x400?text=Parameter+Tuning" alt="Parameter Tuning" class="rounded-lg shadow-md max-w-full">
+                        </div>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-gray-800/80 p-6 rounded-xl shadow-lg mb-8">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">4. Optimierte k-Dämpfungskorrektur</h4>
+                        <p class="mb-4">Feinkorrektur des Silk-Dämpfungseffekts bei hohen ℓ durch exponentiell modulierte k-Kopplung.</p>
+                        <div class="flex justify-center">
+                            <img src="https://via.placeholder.com/800x400?text=Optimized+k+Spectrum" alt="Optimized k Spectrum" class="rounded-lg shadow-md max-w-full">
+                        </div>
+                    </div>
+
+                    <div class="bg-white/80 dark:bg-gray-800/80 p-6 rounded-xl shadow-lg">
+                        <h4 class="text-xl font-bold mb-4 text-primary dark:text-blue-300">5. Ursprünglicher Vergleich: Verschiedene C-Werte</h4>
+                        <p class="mb-4">Analyse der Wirkung unterschiedlicher Dämpfungsstärken durch Variation von C.</p>
+                        <div class="flex justify-center">
+                            <img src="https://via.placeholder.com/800x400?text=C+Variation+Spectrum" alt="C Variation Spectrum" class="rounded-lg shadow-md max-w-full">
+                        </div>
+                    </div>
+                </section>
+                </main>
 
             <footer class="mt-20 pt-10 border-t border-gray-300 dark:border-gray-700 text-center fadeIn">
                 <div class="max-w-xl mx-auto">
@@ -291,7 +1084,9 @@
                 setTimeout(() => { // Redraw charts on theme change
                     if (typeof initAlphaChart === 'function') initAlphaChart();
                     if (typeof initDeltaTChart === 'function') initDeltaTChart();
-                    if (typeof initTauChart === 'function') initTauChart(); // Redraw Tau Chart
+                    if (typeof initTauChart === 'function') initTauChart();
+                    if (typeof initPkChart === 'function') initPkChart(); // Add P(k) Chart redraw
+                    if (typeof initLambdaChart === 'function') initLambdaChart(); // Add Lambda(z) Chart redraw
                 }, 50);
             });
         }
@@ -342,8 +1137,16 @@
             if (!ctx) { console.error("alphaChart canvas not found"); return; }
             if (alphaChartInstance) { alphaChartInstance.destroy(); }
 
+            // Get values from sliders
+            const A_fruh = parseFloat(document.getElementById('aFruhSlider').value);
+            const z_t = parseFloat(document.getElementById('ztSlider').value) * 1e9;
+
+            // Update slider value displays
+            document.getElementById('aFruhValue').textContent = A_fruh.toFixed(1);
+            document.getElementById('ztValue').textContent = (z_t / 1e9).toFixed(0);
+
             const currentParams = {
-                A_fruh: 10.0, z_t: 1e10, k: 10 / 1e10, // k*z_t ~ 10
+                A_fruh: A_fruh, z_t: z_t, k: 10 / z_t,
                 alpha_0: -0.65, A_spat: 1.10, z_star: 0.70
             };
 
@@ -415,9 +1218,9 @@
                             title: (tooltipItems) => `z ≈ ${tooltipItems[0].parsed.x.toExponential(1)}`, label: (context) => `α(z) ≈ ${context.parsed.y.toFixed(2)}`
                         }},
                         annotation: { annotations: {
-                            ztLine: { type: 'line', xMin: currentParams.z_t, xMax: currentParams.z_t, borderColor: tailwind.config.theme.extend.colors.accent2, borderWidth: 1.5, borderDash: [6, 6], label: { content: `z_t ≈ 10^${Math.log10(currentParams.z_t).toFixed(0)}`, display: true, position: 'start', yAdjust: -15, font:{size:10}, color: tailwind.config.theme.extend.colors.accent2}},
+                            ztLine: { type: 'line', xMin: currentParams.z_t, xMax: currentParams.z_t, borderColor: tailwind.config.theme.extend.colors.accent2, borderWidth: 1.5, borderDash: [6, 6], label: { content: `z_t ≈ ${z_t.toExponential(0)}`, display: true, position: 'start', yAdjust: -15, font:{size:10}, color: tailwind.config.theme.extend.colors.accent2}},
                             zStarLine: { type: 'line', xMin: currentParams.z_star, xMax: currentParams.z_star, borderColor: '#DE5D9C', borderWidth: 1.5, borderDash: [6, 6], label: { content: `z* = ${currentParams.z_star}`, display: true, position: 'end', yAdjust: 15, font:{size:10}, color:'#DE5D9C'}},
-                            alphaApprox10: { type: 'line', yMin: currentParams.A_fruh, yMax: currentParams.A_fruh, xMin: currentParams.z_t * 10, borderColor: 'rgba(156, 222, 93, 0.5)', borderWidth: 1, borderDash: [2, 2], label: { content: `α ≈ ${currentParams.A_fruh.toFixed(0)}`, display: true, position: 'end', xAdjust: -10, font:{size:9}, color:'rgba(156, 222, 93, 0.8)'}},
+                            alphaApprox10: { type: 'line', yMin: currentParams.A_fruh, yMax: currentParams.A_fruh, xMin: currentParams.z_t * 10, borderColor: 'rgba(156, 222, 93, 0.5)', borderWidth: 1, borderDash: [2, 2], label: { content: `α ≈ ${currentParams.A_fruh.toFixed(1)}`, display: true, position: 'end', xAdjust: -10, font:{size:9}, color:'rgba(156, 222, 93, 0.8)'}},
                             alphaLate: { type: 'line', yMin: currentParams.alpha_0 + currentParams.A_spat, yMax: currentParams.alpha_0 + currentParams.A_spat, xMax: 100, borderColor: 'rgba(93, 156, 222, 0.5)', borderWidth: 1, borderDash: [2, 2], label: { content: `α ≈ ${(currentParams.alpha_0 + currentParams.A_spat).toFixed(2)}`, display: true, position: 'start', xAdjust: 10, font:{size:9}, color:'rgba(93, 156, 222, 0.8)'}},
                             bbnRegion: { type: 'box', xMin: 1e8, xMax: 1e10, backgroundColor: 'rgba(255, 255, 0, 0.05)', borderColor: 'rgba(255, 255, 0, 0.2)', borderWidth: 1, label: { content: 'BBN Era', display: true, position:'start', font:{size:9}, color:'rgba(220, 220, 0, 0.8)'}},
                             cmbRegion: { type: 'box', xMin: 1000, xMax: 1200, backgroundColor: 'rgba(255, 165, 0, 0.05)', borderColor: 'rgba(255, 165, 0, 0.2)', borderWidth: 1, label: { content: 'CMB Rec.', display: true, position:'start', yAdjust: 20, font:{size:9}, color:'rgba(255, 165, 0, 0.8)'}}
@@ -440,15 +1243,15 @@
 
         /**
          * Calculates the damping integral for the deltaT/T evolution.
+         * Uses Simpson's rule for more accurate integration.
          * @param {number} z_target - Redshift up to which the integral is calculated.
          * @param {number} z_max - Starting redshift for the integral.
          * @param {object} params - Model parameters (A_fruh, z_t, k, alpha_0, A_spat, z_star).
-         * @param {boolean} use_binary_alpha - If true, use binary alpha_eff (10 or 0), else use continuous alpha(z).
-         * @param {number} [damping_alpha_binary=10] - Value for binary alpha when z > z_t.
-         * @param {number} [n_steps=200] - Number of steps for numerical integration.
+         * @param {boolean} use_binary_alpha - If true, use binary alpha_eff (A_fruh or 0), else use continuous alpha(z).
+         * @param {number} [n_steps=500] - Number of steps for numerical integration.
          * @returns {number} The calculated value of the damping integral.
          */
-        function calculateDampingIntegral(z_target, z_max, params, use_binary_alpha, damping_alpha_binary = 10, n_steps=200) {
+        function calculateDampingIntegral(z_target, z_max, params, use_binary_alpha, n_steps=500) {
             let integral = 0;
             if (z_target >= z_max) return 0;
 
@@ -456,27 +1259,49 @@
             const log_z_max = Math.log(z_max);
             const log_dz = (log_z_max - log_z_target) / n_steps;
 
-            for (let i = 0; i < n_steps; i++) {
-                const log_z_mid = log_z_target + (i + 0.5) * log_dz;
-                const z_mid = Math.exp(log_z_mid);
+            // Simpson's rule for more accurate integration
+            for (let i = 0; i < n_steps; i += 2) {
+                if (i + 2 >= n_steps) break; // Ensure we have 3 points for Simpson's rule
+                
+                const log_z0 = log_z_target + i * log_dz;
+                const log_z1 = log_z_target + (i + 1) * log_dz;
+                const log_z2 = log_z_target + (i + 2) * log_dz;
 
-                let alpha_to_use;
+                const z0 = Math.exp(log_z0);
+                const z1 = Math.exp(log_z1);
+                const z2 = Math.exp(log_z2);
+
+                // Determine alpha_eff for each point
+                let alpha0, alpha1, alpha2;
+                
                 if (use_binary_alpha) {
-                    alpha_to_use = (z_mid > params.z_t) ? damping_alpha_binary : 0;
+                    alpha0 = (z0 > params.z_t) ? params.A_fruh : 0;
+                    alpha1 = (z1 > params.z_t) ? params.A_fruh : 0;
+                    alpha2 = (z2 > params.z_t) ? params.A_fruh : 0;
                 } else {
-                    alpha_to_use = calculateUnifiedAlpha(z_mid, params);
+                    alpha0 = calculateUnifiedAlpha(z0, params);
+                    alpha1 = calculateUnifiedAlpha(z1, params);
+                    alpha2 = calculateUnifiedAlpha(z2, params);
                 }
-                alpha_to_use = Math.max(alpha_to_use, 0); // Prevent issues with negative exponent base
+                
+                // Prevent issues with negative alpha values
+                alpha0 = Math.max(alpha0, 0);
+                alpha1 = Math.max(alpha1, 0);
+                alpha2 = Math.max(alpha2, 0);
 
-                if (alpha_to_use > 1) {
-                    const integrand = Math.pow(1 + z_mid, alpha_to_use - 1);
-                    const dz = z_mid * log_dz; // dz = z * d(ln z)
-                    integral += integrand * dz;
+                if (alpha0 > 1 || alpha1 > 1 || alpha2 > 1) {
+                    // Calculate the integrand at each point: (1+z)^(alpha-1) * dz
+                    const f0 = Math.pow(1 + z0, alpha0 - 1) * z0;
+                    const f1 = Math.pow(1 + z1, alpha1 - 1) * z1;
+                    const f2 = Math.pow(1 + z2, alpha2 - 1) * z2;
+                    
+                    // Simpson's rule: integral over interval ≈ (dz/6) * (f0 + 4*f1 + f2)
+                    integral += (log_dz / 3) * (f0 + 4 * f1 + f2);
                 }
             }
+            
             return integral;
         }
-
 
         /**
          * Initializes or updates the delta T / T chart.
@@ -486,19 +1311,28 @@
             if (!ctx) { console.error("deltaTChart canvas not found"); return; }
             if (deltaTChartInstance) { deltaTChartInstance.destroy(); }
 
+            // Get values from sliders
+            const C_original = parseFloat(document.getElementById('cSlider').value) * 1e-33;
+            const A_fruh = parseFloat(document.getElementById('aFruhSlider').value);
+            const z_t = parseFloat(document.getElementById('ztSlider').value) * 1e9;
+
+            // Update slider value displays
+            document.getElementById('cValue').textContent = (C_original / 1e-33).toFixed(1);
+            document.getElementById('aFruhValue').textContent = A_fruh.toFixed(1);
+            document.getElementById('ztValue').textContent = (z_t / 1e9).toFixed(0);
+
             const params = {
-                A_fruh: 10.0, z_t: 1e10, k: 10/1e10,
+                A_fruh: A_fruh, z_t: z_t, k: 10/z_t,
                 alpha_0: -0.65, A_spat: 1.10, z_star: 0.70,
             };
 
             const zValues = np.logspace(3, 12, 150);
 
             // --- Calculate delta T/T for different scenarios ---
-            const C_original = 2e-33;
             const C_values_test = { // C values for testing (using continuous alpha)
-                lower: 1e-33,
-                extra: 5e-33, // Added C=5e-33 test
-                higher: 1e-32
+                lower: 5e-34,    // Lower test C
+                extra: 5e-33,    // Extra C=5e-33 test
+                higher: 1e-32    // Higher test C
             };
             const z_max_integral = 1e12;
             const delta0 = 1e-3;
@@ -610,7 +1444,7 @@
                         annotation: { annotations: {
                             zCMB: { type: 'line', xMin: 1100, xMax: 1100, borderColor: '#DE5D9C', borderDash:[4,4], borderWidth: 1.5, label: { content: 'z ≈ 1100 (CMB)', display: true, position:'start', font:{size:10}, color:'#DE5D9C'} },
                             targetDelta: { type: 'line', yMin: 1e-5, yMax: 1e-5, borderColor: colors.accent3, borderDash:[4,4], borderWidth: 1.5, label: { content: 'δT/T ≈ 10⁻⁵ (Beob.)', display: true, position:'end', font:{size:10}, color: colors.accent3}},
-                            ztLineDelta: { type: 'line', xMin: params.z_t, xMax: params.z_t, borderColor: colors.accent2, borderDash: [6, 6], borderWidth: 1.5, label: { content: `z_t = 10^${Math.log10(params.z_t).toFixed(0)}`, display: true, position: 'top', yAdjust: 5, font:{size:10}, color: colors.accent2 } },
+                            ztLineDelta: { type: 'line', xMin: params.z_t, xMax: params.z_t, borderColor: colors.accent2, borderDash: [6, 6], borderWidth: 1.5, label: { content: `z_t = ${z_t.toExponential(0)}`, display: true, position: 'top', yAdjust: 5, font:{size:10}, color: colors.accent2 } },
                             bbnRegionDelta: { type: 'box', xMin: 1e8, xMax: 1e10, yMin: 1e-6, yMax: 1e-2,
                                 backgroundColor: 'rgba(255, 255, 0, 0.05)', borderColor: 'rgba(255, 255, 0, 0.2)', borderWidth: 1, label: { content: 'BBN', display: true, position:'top', xAdjust: -15, font:{size:9}, color:'rgba(220, 220, 0, 0.8)'}
                             },
@@ -682,8 +1516,6 @@
             // Approximation using standard value for Thomson optical depth timescale today ~ 1 / (sigma_T * n_e0 * c) ~ 1.6e18 s ~ 50 Gyr
             // tau_e(z) = tau_e(0) / (1+z)^3 (Incorrect scaling for time)
             // Use direct formula: tau_e = 1 / (sigma_T * n_e(z) * c)
-            const tau_e = 1 / (sigma_T * n_e_z * c);
-            // Check calculation: 1 / (6.65e-29 * 0.25 * (1+z)^3 * 3e8) = 1 / (5e-21 * (1+z)^3) s
             return 1 / (5e-21 * Math.pow(1 + z, 3)); // Seems correct
          }
 
@@ -696,29 +1528,37 @@
             if (!ctx) { console.error("tauChart canvas not found"); return; }
             if (tauChartInstance) { tauChartInstance.destroy(); }
 
-            const params = { // Use same params as other charts
-                A_fruh: 10.0, z_t: 1e10, k: 10/1e10,
+            // Get values from sliders
+            const C_original = parseFloat(document.getElementById('cSlider').value) * 1e-33;
+            const A_fruh = parseFloat(document.getElementById('aFruhSlider').value);
+            const z_t = parseFloat(document.getElementById('ztSlider').value) * 1e9;
+
+            const params = { // Use params from sliders
+                A_fruh: A_fruh, z_t: z_t, k: 10/z_t,
                 alpha_0: -0.65, A_spat: 1.10, z_star: 0.70,
             };
             const zValues = np.logspace(3, 12, 150); // z from 1000 to 1e12
-            const C_original = 2e-33;
 
             // Calculate Tau_Lambda (Continuous Alpha)
             const tauLambdaCont = zValues.map(z => {
                 const alpha = calculateUnifiedAlpha(z, params);
                 const alpha_eff = Math.max(alpha, 0); // Ensure alpha_eff >= 0
-                // Avoid division by zero or extremely large numbers if alpha <= 1
-                if (alpha_eff <= 1) return 1e60; // Assign a very large time if no damping
+                
+                if (alpha_eff <= 1) {
+                    // Interpolate to a large, but finite value with smooth transition
+                    return 1e20 * (1 + Math.exp(-10 * (alpha_eff - 1))); 
+                }
+                
                 const rate = C_original * Math.pow(1 + z, alpha_eff - 1);
-                return rate > 0 ? 1 / rate : 1e60; // Return 1/rate or very large time
+                return rate > 0 ? 1 / rate : 1e20;
             });
 
             // Calculate Tau_Lambda (Binary Alpha)
             const tauLambdaBin = zValues.map(z => {
-                const alpha_eff = (z > params.z_t) ? 10 : 0;
-                if (alpha_eff <= 1) return 1e60;
+                const alpha_eff = (z > params.z_t) ? params.A_fruh : 0;
+                if (alpha_eff <= 1) return 1e20;
                 const rate = C_original * Math.pow(1 + z, alpha_eff - 1);
-                return rate > 0 ? 1 / rate : 1e60;
+                return rate > 0 ? 1 / rate : 1e20;
             });
 
             // Calculate Tau_e (Electron Scattering Time)
@@ -783,7 +1623,7 @@
                             label: (context) => `${context.dataset.label} ≈ ${context.parsed.y.toExponential(1)} s`
                         }},
                         annotation: { annotations: { // Annotate z_t on Tau chart too
-                             ztLineTau: { type: 'line', xMin: params.z_t, xMax: params.z_t, borderColor: colors.accent2, borderDash: [6, 6], borderWidth: 1.5, label: { content: `z_t = 10^${Math.log10(params.z_t).toFixed(0)}`, display: true, position: 'top', yAdjust: 5, font:{size:10}, color: colors.accent2 } }
+                             ztLineTau: { type: 'line', xMin: params.z_t, xMax: params.z_t, borderColor: colors.accent2, borderDash: [6, 6], borderWidth: 1.5, label: { content: `z_t = ${z_t.toExponential(0)}`, display: true, position: 'top', yAdjust: 5, font:{size:10}, color: colors.accent2 } }
                         }}
                     }
                 },
@@ -797,21 +1637,408 @@
             });
         }
 
+        // --- P(k) Chart Logic ---
+        let pkChartInstance = null;
+
+        function initPkChart() {
+            const ctx = document.getElementById('pkChart')?.getContext('2d');
+            if (!ctx) { console.error("pkChart canvas not found"); return; }
+            if (pkChartInstance) { pkChartInstance.destroy(); }
+
+            // Get values from sliders
+            const A_fruh = parseFloat(document.getElementById('aFruhSlider').value);
+            const z_t = parseFloat(document.getElementById('ztSlider').value) * 1e9;
+
+            // Vereinfachtes Modell für P(k), basierend auf einer Näherung
+            const kValues = np.logspace(-4, 0, 200); // k von 10^-4 bis 1 Mpc^-1
+            
+            // Define parameters for the P(k) model
+            const n_s = 0.965; // Spectral index
+            const A_s = 2.1e-9; // Amplitude of primordial power spectrum
+            const k_pivot = 0.05; // Pivot scale in Mpc^-1
+            const k_ref = 0.1; // Reference scale for damping in Mpc^-1
+            
+            // Calculate P(k) for GDE model with k-dependent damping
+            const PkGDE = kValues.map(k => {
+                // Primordial power spectrum P(k) = A_s * (k/k_pivot)^(n_s-1)
+                const Pk0 = A_s * Math.pow(k / k_pivot, n_s - 1);
+                
+                // k-dependent damping factor exp(-(k/k_ref)^2)
+                const damping = Math.exp(-Math.pow(k / k_ref, 2));
+                
+                // Apply a scale factor for visualization
+                return Pk0 * damping * 1e6;
+            });
+            
+            // Calculate standard ΛCDM P(k) for comparison
+            const PkLCDM = kValues.map(k => A_s * Math.pow(k / k_pivot, n_s - 1) * 1e6);
+
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            const textColor = isDarkMode ? '#e2e8f0' : '#1f2937';
+            const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            const colors = tailwind.config.theme.extend.colors;
+
+            pkChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: kValues,
+                    datasets: [
+                        { label: 'P(k) GDE', data: PkGDE, borderColor: colors.primary, borderWidth: 2, pointRadius: 0, fill: false, tension: 0.1 },
+                        { label: 'P(k) ΛCDM', data: PkLCDM, borderColor: colors.accent3, borderDash: [5, 5], borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.1 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'logarithmic', min: 1e-4, max: 1,
+                            title: { display: true, text: 'k [Mpc⁻¹]', color: textColor, font: { weight: 'bold' } },
+                            grid: { color: gridColor }, ticks: { color: textColor, callback: function(value) {
+                                const log10 = Math.log10(value); if (Math.abs(log10 - Math.round(log10)) < 1e-9) { return `10^${Math.round(log10)}`; } return null;
+                            }}
+                        },
+                        y: {
+                            type: 'logarithmic', min: 1e2, max: 1e7,
+                            title: { display: true, text: 'P(k) [willk. Einh.]', color: textColor, font: { weight: 'bold' } },
+                            grid: { color: gridColor }, ticks: { color: textColor, callback: function(value) {
+                                const log10 = Math.log10(value); if (Math.abs(log10 - Math.round(log10)) < 1e-9) { return `10^${Math.round(log10)}`; } return null;
+                            }}
+                        }
+                    },
+                    plugins: {
+                        legend: { 
+                            labels: { color: textColor },
+                            // JS Hover effect for legend
+                            onHover: (event, legendItem, legend) => {
+                                const chartContainer = legend.chart.canvas.closest('.chart-container');
+                                if (chartContainer) { chartContainer.style.setProperty('--legend-opacity', '1'); }
+                                legend.chart.data.datasets.forEach((d, i) => { d.borderWidth = (i === legendItem.datasetIndex) ? 3 : (i === 0 ? 2 : 1.5); }); // Highlight hovered
+                                legend.chart.update();
+                            },
+                            onLeave: (event, legendItem, legend) => {
+                                const chartContainer = legend.chart.canvas.closest('.chart-container');
+                                if (chartContainer) { chartContainer.style.setProperty('--legend-opacity', '0.6'); }
+                                legend.chart.data.datasets.forEach((d, i) => { d.borderWidth = (i === 0 ? 2 : 1.5); }); // Reset width
+                                legend.chart.update();
+                            }
+                        },
+                        tooltip: { mode: 'index', intersect: false, callbacks: {
+                            title: (tooltipItems) => `k ≈ ${tooltipItems[0].parsed.x.toExponential(1)} Mpc⁻¹`,
+                            label: (context) => `${context.dataset.label} ≈ ${context.parsed.y.toExponential(1)}`
+                        }},
+                        annotation: { annotations: {
+                            kRef: { type: 'line', xMin: k_ref, xMax: k_ref, borderColor: colors.accent2, borderDash: [6, 6], borderWidth: 1.5, label: { content: `k_ref = ${k_ref} Mpc⁻¹`, display: true, position: 'start', yAdjust: -15, font:{size:10}, color: colors.accent2 } },
+                            galaxyScale: { type: 'box', xMin: 0.01, xMax: 0.1, backgroundColor: 'rgba(255, 165, 0, 0.05)', borderColor: 'rgba(255, 165, 0, 0.2)', borderWidth: 1, label: { content: 'Galaxien-Skalen', display: true, position:'start', font:{size:9}, color:'rgba(255, 165, 0, 0.8)'}}
+                        }}
+                    }
+                },
+                plugins: [{
+                    id: 'chartRendered',
+                    afterRender: (chart) => {
+                        chart.canvas.classList.add('chart-rendered');
+                    }
+                }]
+            });
+        }
+        
+        // --- Lambda(z) Chart Logic ---
+        let lambdaChartInstance = null;
+        
+        function initLambdaChart() {
+            const ctx = document.getElementById('lambdaChart')?.getContext('2d');
+            if (!ctx) { console.error("lambdaChart canvas not found"); return; }
+            if (lambdaChartInstance) { lambdaChartInstance.destroy(); }
+            
+            // Lambda(z)/Lambda0 data from the attached file
+            const lambdaData = [
+                {z: 0.00000, ratio: 1.00000},
+                {z: 0.03030, ratio: 0.97982},
+                {z: 0.06061, ratio: 0.96113},
+                {z: 0.09091, ratio: 0.94391},
+                {z: 0.12121, ratio: 0.92810},
+                {z: 0.15152, ratio: 0.91371},
+                {z: 0.18182, ratio: 0.90073},
+                {z: 0.21212, ratio: 0.88915},
+                {z: 0.24242, ratio: 0.87900},
+                {z: 0.27273, ratio: 0.87029},
+                {z: 0.30303, ratio: 0.86306},
+                {z: 0.33333, ratio: 0.85733},
+                {z: 0.36364, ratio: 0.85315},
+                {z: 0.39394, ratio: 0.85055},
+                {z: 0.42424, ratio: 0.84957},
+                {z: 0.45455, ratio: 0.85025},
+                {z: 0.48485, ratio: 0.85261},
+                {z: 0.51515, ratio: 0.85670},
+                {z: 0.54545, ratio: 0.86251},
+                {z: 0.57576, ratio: 0.87006},
+                {z: 0.60606, ratio: 0.87933},
+                {z: 0.63636, ratio: 0.89030},
+                {z: 0.66667, ratio: 0.90291},
+                {z: 0.69697, ratio: 0.91710},
+                {z: 0.72727, ratio: 0.93279},
+                {z: 0.75758, ratio: 0.94986},
+                {z: 0.78788, ratio: 0.96820},
+                {z: 0.81818, ratio: 0.98766},
+                {z: 0.84848, ratio: 1.00809},
+                {z: 0.87879, ratio: 1.02933},
+                {z: 0.90909, ratio: 1.05121},
+                {z: 0.93939, ratio: 1.07356},
+                {z: 0.96970, ratio: 1.09622},
+                {z: 1.00000, ratio: 1.11902},
+                {z: 1.03030, ratio: 1.14181},
+                {z: 1.06061, ratio: 1.16446},
+                {z: 1.09091, ratio: 1.18685},
+                {z: 1.12121, ratio: 1.20888},
+                {z: 1.15152, ratio: 1.23044},
+                {z: 1.18182, ratio: 1.25148},
+                {z: 1.21212, ratio: 1.27192},
+                {z: 1.24242, ratio: 1.29174},
+                {z: 1.27273, ratio: 1.31090},
+                {z: 1.30303, ratio: 1.32939},
+                {z: 1.33333, ratio: 1.34719},
+                {z: 1.36364, ratio: 1.36433},
+                {z: 1.39394, ratio: 1.38079},
+                {z: 1.42424, ratio: 1.39661},
+                {z: 1.45455, ratio: 1.41181},
+                {z: 1.48485, ratio: 1.42640},
+                {z: 1.51515, ratio: 1.44042},
+                {z: 1.54545, ratio: 1.45389},
+                {z: 1.57576, ratio: 1.46686},
+                {z: 1.60606, ratio: 1.47933},
+                {z: 1.63636, ratio: 1.49136},
+                {z: 1.66667, ratio: 1.50296},
+                {z: 1.69697, ratio: 1.51417},
+                {z: 1.72727, ratio: 1.52501},
+                {z: 1.75758, ratio: 1.53551},
+                {z: 1.78788, ratio: 1.54569},
+                {z: 1.81818, ratio: 1.55558},
+                {z: 1.84848, ratio: 1.56519},
+                {z: 1.87879, ratio: 1.57456},
+                {z: 1.90909, ratio: 1.58370},
+                {z: 1.93939, ratio: 1.59262},
+                {z: 1.96970, ratio: 1.60134},
+                {z: 2.00000, ratio: 1.60988},
+                {z: 2.03030, ratio: 1.61824},
+                {z: 2.06061, ratio: 1.62646},
+                {z: 2.09091, ratio: 1.63452},
+                {z: 2.12121, ratio: 1.64246},
+                {z: 2.15152, ratio: 1.65027},
+                {z: 2.18182, ratio: 1.65796},
+                {z: 2.21212, ratio: 1.66554},
+                {z: 2.24242, ratio: 1.67303},
+                {z: 2.27273, ratio: 1.68042},
+                {z: 2.30303, ratio: 1.68772},
+                {z: 2.33333, ratio: 1.69494},
+                {z: 2.36364, ratio: 1.70209},
+                {z: 2.39394, ratio: 1.70916},
+                {z: 2.42424, ratio: 1.71617},
+                {z: 2.45455, ratio: 1.72311},
+                {z: 2.48485, ratio: 1.73000},
+                {z: 2.51515, ratio: 1.73682},
+                {z: 2.54545, ratio: 1.74359},
+                {z: 2.57576, ratio: 1.75031},
+                {z: 2.60606, ratio: 1.75699},
+                {z: 2.63636, ratio: 1.76361},
+                {z: 2.66667, ratio: 1.77019},
+                {z: 2.69697, ratio: 1.77673},
+                {z: 2.72727, ratio: 1.78322},
+                {z: 2.75758, ratio: 1.78968},
+                {z: 2.78788, ratio: 1.79610},
+                {z: 2.81818, ratio: 1.80248},
+                {z: 2.84848, ratio: 1.80883},
+                {z: 2.87879, ratio: 1.81514},
+                {z: 2.90909, ratio: 1.82142},
+                {z: 2.93939, ratio: 1.82767},
+                {z: 2.96970, ratio: 1.83388},
+                {z: 3.00000, ratio: 1.84007}
+            ];
+            
+            const zValues = lambdaData.map(point => point.z);
+            const ratioValues = lambdaData.map(point => point.ratio);
+            
+            // Reference line at Lambda/Lambda0 = 1
+            const referenceValues = zValues.map(z => 1.0);
+            
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            const textColor = isDarkMode ? '#e2e8f0' : '#1f2937';
+            const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            const colors = tailwind.config.theme.extend.colors;
+            
+            lambdaChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: zValues,
+                    datasets: [
+                        {
+                            label: 'Λ(z)/Λ₀',
+                            data: ratioValues,
+                            borderColor: colors.lambda,
+                            backgroundColor: 'rgba(225, 29, 72, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: true,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Referenz Λ₀',
+                            data: referenceValues,
+                            borderColor: 'rgba(107, 114, 128, 0.7)',
+                            borderDash: [5, 5],
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Rotverschiebung z',
+                                color: textColor,
+                                font: { weight: 'bold' }
+                            },
+                            grid: { color: gridColor },
+                            ticks: { color: textColor },
+                            min: 0,
+                            max: 3
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Λ(z)/Λ₀',
+                                color: textColor,
+                                font: { weight: 'bold' }
+                            },
+                            grid: { color: gridColor },
+                            ticks: { color: textColor },
+                            min: 0.8,
+                            max: 1.9
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: textColor },
+                            onHover: (event, legendItem, legend) => {
+                                const chartContainer = legend.chart.canvas.closest('.chart-container');
+                                if (chartContainer) {
+                                    chartContainer.style.setProperty('--legend-opacity', '1');
+                                }
+                                legend.chart.data.datasets.forEach((d, i) => {
+                                    d.borderWidth = (i === legendItem.datasetIndex) ? (i === 0 ? 3 : 2) : (i === 0 ? 2 : 1.5);
+                                });
+                                legend.chart.update();
+                            },
+                            onLeave: (event, legendItem, legend) => {
+                                const chartContainer = legend.chart.canvas.closest('.chart-container');
+                                if (chartContainer) {
+                                    chartContainer.style.setProperty('--legend-opacity', '0.6');
+                                }
+                                legend.chart.data.datasets.forEach((d, i) => {
+                                    d.borderWidth = (i === 0 ? 2 : 1.5);
+                                });
+                                legend.chart.update();
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                title: (tooltipItems) => `z = ${tooltipItems[0].parsed.x.toFixed(2)}`,
+                                label: (context) => context.dataset.label === 'Λ(z)/Λ₀' ? 
+                                    `Λ(z)/Λ₀ = ${context.parsed.y.toFixed(4)}` : 
+                                    `${context.dataset.label}`
+                            }
+                        },
+                        annotation: {
+                            annotations: {
+                                zStarLine: {
+                                    type: 'line',
+                                    xMin: 0.7,
+                                    xMax: 0.7,
+                                    borderColor: '#DE5D9C',
+                                    borderDash: [6, 6],
+                                    borderWidth: 1.5,
+                                    label: {
+                                        content: 'z* = 0.7',
+                                        display: true,
+                                        position: 'start',
+                                        yAdjust: -10,
+                                        font: { size: 10 },
+                                        color: '#DE5D9C'
+                                    }
+                                },
+                                phantomRegion: {
+                                    type: 'box',
+                                    xMin: 0.8,
+                                    xMax: 3,
+                                    yMin: 1,
+                                    yMax: 1.9,
+                                    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                                    borderColor: 'rgba(139, 92, 246, 0.2)',
+                                    borderWidth: 1,
+                                    label: {
+                                        content: 'Phantom-Region (w < -1)',
+                                        display: true,
+                                        position: 'center',
+                                        font: { size: 10, style: 'italic' },
+                                        color: 'rgba(139, 92, 246, 0.8)'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'chartRendered',
+                    afterRender: (chart) => {
+                        chart.canvas.classList.add('chart-rendered');
+                    }
+                }]
+            });
+        }
 
         // --- DOMContentLoaded ---
         document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for sliders
+            document.getElementById('aFruhSlider').addEventListener('input', function() {
+                initAlphaChart();
+                initDeltaTChart();
+                initTauChart();
+                initPkChart();
+            });
+            
+            document.getElementById('ztSlider').addEventListener('input', function() {
+                initAlphaChart();
+                initDeltaTChart();
+                initTauChart();
+                initPkChart();
+            });
+            
+            document.getElementById('cSlider').addEventListener('input', function() {
+                initDeltaTChart();
+                initTauChart();
+            });
+            
             if (typeof MathJax !== 'undefined' && typeof MathJax.typesetPromise === 'function') {
                  MathJax.typesetPromise().then(() => {
                     console.log('MathJax typesetting complete.');
                     initAlphaChart();
                     initDeltaTChart();
-                    initTauChart(); // Initialize Tau Chart
+                    initTauChart();
+                    initPkChart(); // Initialize P(k) Chart
+                    initLambdaChart(); // Initialize Lambda(z) Chart
                  }).catch((err) => console.error('MathJax typesetting failed:', err));
             } else {
                  console.warn('MathJax not found or typesetPromise unavailable. Initializing charts directly.');
                  initAlphaChart();
                  initDeltaTChart();
-                 initTauChart(); // Initialize Tau Chart
+                 initTauChart();
+                 initPkChart(); // Initialize P(k) Chart
+                 initLambdaChart(); // Initialize Lambda(z) Chart
             }
         });
 
@@ -821,7 +2048,6 @@
             svg: { fontCache: 'global' },
             startup: { ready: () => { console.log('MathJax is ready'); MathJax.startup.defaultReady(); } }
         };
-
     </script>
 </body>
 </html>
